@@ -41,6 +41,7 @@ const STATS = [
 const HELP_GROUPS = [
   {
     id: 'emotional-support',
+    navLabel: 'Emotional support',
     number: '01',
     eyebrow: 'Care & connection',
     title: 'Emotional and therapeutic support',
@@ -58,10 +59,11 @@ const HELP_GROUPS = [
   },
   {
     id: 'evidence',
+    navLabel: 'Evidence & victim services',
     number: '02',
     eyebrow: 'Documentation & victim services',
     title: 'Evidence and crime-victim assistance',
-    summary: 'Learn what information may be useful to preserve, and find advocates who can explain reporting options.',
+    summary: 'Explore what information to keep and find advocates who can explain reporting options.',
     resources: [
       { name: 'CCRI Safety Center', detail: 'Practical guidance on documenting and preserving online evidence, including URLs, dates and screenshots.', url: 'https://cybercivilrights.org/ccri-safety-center/', tag: 'Evidence guidance' },
       { name: 'Office for Victims of Crime directory', detail: 'Find local victim-service organizations by location, victimization type and available services.', url: 'https://ovc.ojp.gov/directory-crime-victim-services/search', tag: 'Find local help' },
@@ -73,10 +75,11 @@ const HELP_GROUPS = [
   },
   {
     id: 'removal',
+    navLabel: 'Content removal',
     number: '03',
     eyebrow: 'Content removal',
     title: 'Tools to help limit the spread',
-    summary: 'These organizations and agencies have different roles and eligibility requirements.',
+    summary: 'Each service has a different role and eligibility requirements.',
     resources: [
       { name: 'StopNCII.org', detail: 'Free on-device hashing tool for adults whose intimate images were made when they were 18 or older. Works with participating platforms.', url: 'https://stopncii.org/', tag: 'Images taken at 18+' },
       { name: 'Take It Down by NCMEC', detail: 'Hash-based service for intimate images taken when the person was under 18. The image remains on your device.', url: 'https://takeitdown.ncmec.org/', tag: 'Images taken under 18' },
@@ -86,10 +89,11 @@ const HELP_GROUPS = [
   },
   {
     id: 'legal',
+    navLabel: 'Legal assistance',
     number: '04',
     eyebrow: 'Rights & advocacy',
     title: 'Legal information and assistance',
-    summary: 'Find jurisdiction-specific advice and learn about rights and available remedies.',
+    summary: 'Find legal guidance for your location and learn about your rights and options.',
     resources: [
       { name: 'LawHelp.org', detail: 'State-by-state legal aid directories and plain-language legal information; eligibility varies.', url: 'https://www.lawhelp.org/', tag: 'Find legal aid' },
       { name: 'Legal Services Corporation', detail: 'Locate organizations providing civil legal aid for eligible people with low incomes.', url: 'https://www.lsc.gov/about-lsc/what-legal-aid/i-need-legal-help', tag: 'Civil legal aid' },
@@ -99,6 +103,18 @@ const HELP_GROUPS = [
       { name: 'ALIGHT — Mobilizing Justice', detail: 'Connects eligible human trafficking survivors with pro bono legal assistance for issues including online privacy, family law, identity theft, criminal records, and other legal needs. Geographic and intake requirements apply.', url: 'https://alightnet.org/get-help/', tag: 'Survivor legal support' },
       { name: 'The Joseph Project', detail: 'Connects human trafficking survivors with pro bono legal assistance through an intake and referral process. Eligibility is assessed individually, and representation is not guaranteed.', url: 'https://www.josephproject.com/advocate', tag: 'Trafficking legal aid' },
       { name: 'Freedom Network USA', detail: 'National network of organizations providing legal assistance, advocacy, and support services for human trafficking survivors. Explore its member organizations to find potential legal help; services and eligibility vary.', url: 'https://freedomnetworkusa.org/', tag: 'Trafficking legal resources' },
+    ],
+  },
+  {
+    id: 'ai-support',
+    navLabel: 'AI support tools',
+    number: '05',
+    eyebrow: 'Additional guidance & practical tools',
+    title: 'AI-Powered Survivor Support',
+    summary: 'These optional AI tools offer guidance and practical help. Review their responses carefully and choose what personal information to share. They do not replace professional support or emergency assistance.',
+    resources: [
+      { name: 'Survivor AI by Chayn', detail: 'Survivor-centered AI tool for drafting personalized takedown request letters for nonconsensual intimate imagery and other harmful online content. Still in development.', url: 'https://tools.chayn.co/', tag: 'AI-Assisted Takedown Requests' },
+      { name: 'Ruth by Polaris', detail: 'A trauma-informed AI tool offering digital safety guidance, personalized safety planning, and support resources for people experiencing abuse, exploitation, or online harm.', url: 'https://polaris.meetruth.ai/', tag: 'AI Survivor Support' },
     ],
   },
 ];
@@ -163,12 +179,12 @@ export function WhyItMattersPage({ onNavigate }) {
 
 export function GetHelpPage() {
   return <div className="info-page help-page">
-    <InfoHeader label="Get help" title="Support, when you want it." subtitle="You can begin with emotional support, evidence guidance, content removal, or legal information. These paths can happen in any order." />
+    <InfoHeader label="Get help" title="Support, when you want it." subtitle="Explore emotional support, evidence guidance, content removal, legal information, or optional AI tools. You choose where to begin." />
 
     <nav className="help-quick-links" aria-label="Choose a kind of help">
       {HELP_GROUPS.map(group => <a key={group.id} href={`#${group.id}`} className="help-quick-link">
         <span className="help-quick-number">{group.number}</span>
-        <span>{group.title}</span>
+        <span>{group.navLabel}</span>
         <span className="help-quick-arrow" aria-hidden="true">↓</span>
       </a>)}
     </nav>
