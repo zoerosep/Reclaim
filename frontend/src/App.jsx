@@ -141,7 +141,9 @@ function App() {
   alt="RECLAIM"
 />
     
-  </a>
+    </a>
+
+  <span className="nav-wordmark">Reclaim</span>
 
   <nav className="nav-links" aria-label="Main navigation">
     <a href="/" aria-current={page === 'app' ? 'page' : undefined}
@@ -151,14 +153,15 @@ function App() {
       onClick={event => navigate(event, '/why-it-matters')}>Why it matters</a>
     <a href="/get-help"
       aria-current={page === 'help' ? 'page' : undefined}
-      onClick={event => navigate(event, '/get-help')}>Get help</a>
+            onClick={event => navigate(event, '/get-help')}>Get help</a>
+      
   </nav>
 </header>
       <main id="main-content">
         {page === 'why' ? <WhyItMattersPage onNavigate={navigate} /> : page === 'help' ? <GetHelpPage /> : (
           <>
         <section className="hero" aria-labelledby="page-title">
-  <h1 id="page-title">Reclaim</h1>
+  <h2 id="page-title">Our Mission:</h2>
 
   <p className="lead">
     Helping survivors regain control of their digital lives
