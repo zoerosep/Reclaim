@@ -1,0 +1,4 @@
+-r requirements.txt
+# OPTIONAL; CPU-only models may require several hundred MB of dependencies.
+# Install matching torch/torchvision builds for your OS, then:
+open_clip_torch>=4,<5
