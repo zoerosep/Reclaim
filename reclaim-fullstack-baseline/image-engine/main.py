@@ -20,3 +20,6 @@ def process_image(image_path):
         "image_analysis": analyse_image(image_path),
         "hashes": get_image_hash(image_path)
     }
+if __name__ == "__main__":
+    result = process_image("test_images/images (3).jpg")
+    print(result)
