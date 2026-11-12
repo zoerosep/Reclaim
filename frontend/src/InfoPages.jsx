@@ -52,6 +52,8 @@ const HELP_GROUPS = [
       { name: 'Find a trauma-informed therapist', detail: 'RAINN’s guide to finding licensed, trauma-informed mental health care and local survivor-support referrals.', url: 'https://rainn.org/mental-health-therapy-support-after-sexual-violence/how-to-find-a-trauma-informed-therapist/', tag: 'Therapy guide' },
       { name: 'FindTreatment.gov', detail: 'A confidential U.S. treatment locator for mental health care and related services, including nearby programs.', url: 'https://www.findtreatment.gov/', tag: 'Find care near you' },
       { name: 'VictimConnect Resource Center', detail: 'Confidential support and referrals for people affected by crime. Call or text 855-484-2846.', url: 'https://victimconnect.org/', tag: 'Support & referrals' },
+      { name: 'Digital Identity Foundation — Aster Ellis Fund', detail: 'Free, individualized support for adults experiencing image-based sexual abuse, sexual deepfakes, or sextortion, including image-removal assistance and referrals.', url: 'https://www.thedigitalidentityfoundation.org/get-support', tag: 'Image-based abuse' },
+      { name: 'National Human Trafficking Hotline', detail: '24/7 trafficking-related support and service referrals. Call 1-888-373-7888 or text 233733. Confidentiality exceptions apply.', url: 'https://humantraffickinghotline.org/', tag: 'Trafficking support' },
     ],
   },
   {
@@ -66,6 +68,7 @@ const HELP_GROUPS = [
       { name: 'National Crime Victim Law Institute', detail: 'A searchable database of crime-victim support, rights information, advocacy and referrals.', url: 'https://ncvli.org/victim-resources-database/', tag: 'Victim rights' },
       { name: 'RAINN: Medical and forensic care', detail: 'Information about trauma-informed sexual-assault medical services, including Sexual Assault Nurse Examiners (SANEs) where relevant.', url: 'https://rainn.org/where-to-find-medical-care-after-sexual-assault/', tag: 'Medical / forensic care' },
       { name: 'FBI Tips', detail: 'Official federal tip portal. For an emergency or immediate danger, contact local emergency services instead.', url: 'https://tips.fbi.gov/', tag: 'Reporting option' },
+      { name: 'NNEDV Safety Net', detail: 'Technology safety, privacy, documentation, and safety-planning guidance for survivors of domestic violence, stalking, sexual assault, and trafficking. Educational resource, not a crisis hotline.', url: 'https://www.techsafety.org/', tag: 'Digital safety' },
     ],
   },
   {
@@ -92,6 +95,10 @@ const HELP_GROUPS = [
       { name: 'Legal Services Corporation', detail: 'Locate organizations providing civil legal aid for eligible people with low incomes.', url: 'https://www.lsc.gov/about-lsc/what-legal-aid/i-need-legal-help', tag: 'Civil legal aid' },
       { name: 'FTC: Know your removal rights', detail: 'Consumer guidance on the TAKE IT DOWN Act, removal requests, and what to do if a platform does not comply.', url: 'https://consumer.ftc.gov/consumer-alerts/2026/09/was-your-intimate-image-shared-online-without-your-consent-heres-what-do', tag: 'U.S. federal guidance' },
       { name: 'National Crime Victim Law Institute', detail: 'Information and referrals connected to legal rights for victims of crime.', url: 'https://ncvli.org/', tag: 'Rights & referrals' },
+      { name: 'Cyber Civil Rights Legal Project', detail: 'Pro bono legal assistance for qualifying cases involving nonconsensual intimate imagery. Eligibility restrictions apply, including restrictions involving minors and certain sextortion cases.', url: 'https://cyberrightsproject.com/', tag: 'Legal assistance' },
+      { name: 'ALIGHT — Mobilizing Justice', detail: 'Connects eligible human trafficking survivors with pro bono legal assistance for issues including online privacy, family law, identity theft, criminal records, and other legal needs. Geographic and intake requirements apply.', url: 'https://alightnet.org/get-help/', tag: 'Survivor legal support' },
+      { name: 'The Joseph Project', detail: 'Connects human trafficking survivors with pro bono legal assistance through an intake and referral process. Eligibility is assessed individually, and representation is not guaranteed.', url: 'https://www.josephproject.com/advocate', tag: 'Trafficking legal aid' },
+      { name: 'Freedom Network USA', detail: 'National network of organizations providing legal assistance, advocacy, and support services for human trafficking survivors. Explore its member organizations to find potential legal help; services and eligibility vary.', url: 'https://freedomnetworkusa.org/', tag: 'Trafficking legal resources' },
     ],
   },
 ];
