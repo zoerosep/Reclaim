@@ -266,7 +266,7 @@ export default function EvidenceWorkspace({ selectedResult, queryLabel, clearSel
     setValidationError(null);
   }
   return <div id="evidence-workspace" className="evidence-workspace">
-    <section className="panel vault-panel">
+    <section className="panel vault-panel" data-scroll-reveal>
       <div className="panel-head"><span className="step">03</span><div><h2 ref={savedEvidenceHeadingRef} tabIndex={-1}>Saved evidence</h2><p>Keep the matches you choose. Previews stay hidden until you open them.</p></div></div>
       <p className="vault-warning"><strong>Demo safety note:</strong> Saved items are not encrypted in this browser. Only use sample images. A possible match is not proof of distribution.</p>
       {selectedResult && <div className="save-panel">
@@ -309,7 +309,7 @@ export default function EvidenceWorkspace({ selectedResult, queryLabel, clearSel
       {notice && <p className="vault-notice" aria-hidden="true">{notice}</p>}
       <span role="status" style={{ position: 'absolute', width: 1, height: 1, padding: 0, margin: -1, overflow: 'hidden', clipPath: 'inset(50%)', whiteSpace: 'nowrap', border: 0 }}>{activeOperation === 'export' ? 'Preparing backup…' : activeOperation === 'import' ? 'Restoring backup…' : notice}</span>
     </section>
-    <section id="report-hub" className="panel reporting-panel">
+    <section id="report-hub" className="panel reporting-panel" data-scroll-reveal>
       <div className="panel-head"><span className="step">04</span><div><h2 ref={reportingHeadingRef} tabIndex={-1}>Reporting options</h2><p>Explore a possible next step with a fictional Reddit example.</p></div></div>
       {reportRecord?.sourceIsFictional ? <div className="report-content">
         <p className="fiction-warning"><b>FICTIONAL REPORT DEMO:</b> This entry was not found on Reddit. Do not submit its fictional URL or sample information to Reddit.</p>

@@ -127,7 +127,7 @@ function ExternalLink({ href, children, className = '', 'aria-label': ariaLabel 
 }
 
 function InfoHeader({ label, title, subtitle }) {
-  return <section className="info-hero" aria-labelledby="info-title">
+  return <section className="info-hero" aria-labelledby="info-title" data-scroll-reveal>
     <p className="info-eyebrow">{label}</p>
     <h1 id="info-title">{title}</h1>
     <p className="info-intro">{subtitle}</p>
@@ -140,12 +140,12 @@ export function WhyItMattersPage({ onNavigate }) {
 
     <section className="facts-section" aria-label="Five statistics about image-based abuse and online harassment">
       <div className="facts-grid">
-        {STATS.map((stat, i) => <article className="fact-card" key={i}>
+        {STATS.map((stat, i) => <article className="fact-card" key={i} data-scroll-reveal>
           <p className="fact-type">{stat.category}</p>
           <p className="fact-figure">{stat.value}</p>
           <p className="fact-description">{stat.text}<sup><a href={`#source-${i+1}`} aria-label={`Read source ${i+1}`}>{i+1}</a></sup></p>
         </article>)}
-        <article className="fact-card fact-cta">
+        <article className="fact-card fact-cta" data-scroll-reveal>
           <p className="fact-type">Explore the project</p>
           <h2>From awareness to options.</h2>
           <p>See how our demo approaches discovery, review, saving and reporting.</p>
@@ -155,7 +155,7 @@ export function WhyItMattersPage({ onNavigate }) {
       <p className="facts-caveat">These figures come from different surveys and measure different experiences. The first two concern nonconsensual intimate-image distribution; the other three concern online harassment more broadly.</p>
     </section>
 
-    <section className="panel info-mission" aria-labelledby="mission-title">
+    <section className="panel info-mission" aria-labelledby="mission-title" data-scroll-reveal>
       <div className="info-mission-text">
         <p className="section-kicker purple">About / our mission</p>
         <h2 id="mission-title">Privacy, agency, and practical next steps.</h2>
@@ -169,7 +169,7 @@ export function WhyItMattersPage({ onNavigate }) {
       </aside>
     </section>
 
-    <section className="panel source-section" aria-labelledby="sources-title">
+    <section className="panel source-section" aria-labelledby="sources-title" data-scroll-reveal>
       <p className="section-kicker steel">Research & reading</p>
       <h2 id="sources-title">Sources</h2>
       <ol className="source-list">{STATS.map((stat, i) => <li id={`source-${i+1}`} key={i}>
@@ -185,7 +185,7 @@ export function GetHelpPage() {
     <InfoHeader label="Get help" title="Support, when you want it." subtitle="Explore emotional support, evidence guidance, content removal, legal information, or optional AI tools. You choose where to begin." />
 
     <nav className="help-quick-links" aria-label="Choose a kind of help">
-      {HELP_GROUPS.map(group => <a key={group.id} href={`#${group.id}`} className="help-quick-link">
+      {HELP_GROUPS.map(group => <a key={group.id} href={`#${group.id}`} className="help-quick-link" data-scroll-reveal>
         <span className="help-quick-number">{group.number}</span>
         <span>{group.navLabel}</span>
         <span className="help-quick-arrow" aria-hidden="true">↓</span>
@@ -193,7 +193,7 @@ export function GetHelpPage() {
     </nav>
 
     <div className="help-sections">
-      {HELP_GROUPS.map(group => <section className="panel help-section" id={group.id} key={group.id} aria-labelledby={`${group.id}-heading`}>
+      {HELP_GROUPS.map(group => <section className="panel help-section" id={group.id} key={group.id} aria-labelledby={`${group.id}-heading`} data-scroll-reveal>
         <div className="help-section-head">
           <span className="help-section-number" aria-hidden="true">{group.number}</span>
           <div>

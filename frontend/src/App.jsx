@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { flushSync } from 'react-dom';
 import EvidenceWorkspace from './EvidenceWorkspace.jsx';
 import { WhyItMattersPage, GetHelpPage } from './InfoPages.jsx';
@@ -21,6 +21,112 @@ function App() {
   const mainRef = useRef(null);
   const savedEvidenceHeadingRef = useRef(null);
   const previousPageRef = useRef(page);
+  const [showBackToTop, setShowBackToTop] = useState(false);
+  const [backToTopFocused, setBackToTopFocused] = useState(false);
+  const pastScrollThresholdRef = useRef(false);
+
+  useLayoutEffect(() => {
+    const main = mainRef.current;
+    if (!main?.animate || !window.IntersectionObserver) return;
+    const motionPreference = window.matchMedia('(prefers-reduced-motion: reduce)');
+    if (motionPreference.matches) return;
+    const revealed = new WeakSet();
+    const animations = new Map();
+    let stopped = false;
+    const observer = new IntersectionObserver(entries => {
+      if (stopped) return;
+      entries.forEach(({ target, isIntersecting }) => {
+        if (!isIntersecting || revealed.has(target)) return;
+        revealed.add(target);
+        observer.unobserve(target);
+        if (target.contains(document.activeElement)) return;
+        const animation = target.animate(
+          [{ transform: 'translateY(8px)', opacity: 0.96 }, { transform: 'translateY(0)', opacity: 1 }],
+          { duration: 1200, easing: 'ease-in-out' },
+        );
+        animations.set(target, animation);
+        animation.onfinish = () => animations.delete(target);
+      });
+    });
+    function revealWithoutMotion(target) {
+      if (!target || !main.contains(target)) return;
+      revealed.add(target);
+      observer.unobserve(target);
+      animations.get(target)?.cancel();
+      animations.delete(target);
+    }
+    function onCardFocus(event) {
+      revealWithoutMotion(event.target.closest('[data-scroll-reveal]'));
+    }
+    function skipAnchorReveal(hash) {
+      if (!hash) return;
+      let id;
+      try { id = decodeURIComponent(hash.slice(1)); } catch { return; }
+      const destination = document.getElementById(id);
+      revealWithoutMotion(destination?.closest('[data-scroll-reveal]'));
+    }
+    function onAnchorClick(event) {
+      if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+      const link = event.target.closest('a[href^="#"]');
+      if (link) skipAnchorReveal(link.hash);
+    }
+    function onHashChange() {
+      skipAnchorReveal(window.location.hash);
+    }
+    function stopReveals() {
+      stopped = true;
+      observer.disconnect();
+      animations.forEach(animation => animation.cancel());
+      animations.clear();
+    }
+    function onMotionPreferenceChange(event) {
+      if (event.matches) stopReveals();
+    }
+    onHashChange();
+    main.querySelectorAll('[data-scroll-reveal]').forEach(card => {
+      if (card.contains(document.activeElement)) revealed.add(card);
+      else if (!revealed.has(card)) observer.observe(card);
+    });
+    main.addEventListener('focusin', onCardFocus);
+    main.addEventListener('click', onAnchorClick);
+    window.addEventListener('hashchange', onHashChange);
+    motionPreference.addEventListener('change', onMotionPreferenceChange);
+    return () => {
+      stopReveals();
+      main.removeEventListener('focusin', onCardFocus);
+      main.removeEventListener('click', onAnchorClick);
+      window.removeEventListener('hashchange', onHashChange);
+      motionPreference.removeEventListener('change', onMotionPreferenceChange);
+    };
+  }, [page]);
+
+  useEffect(() => {
+    function updateBackToTop() {
+      const pastThreshold = window.scrollY >= 400;
+      if (pastThreshold === pastScrollThresholdRef.current) return;
+      pastScrollThresholdRef.current = pastThreshold;
+      setShowBackToTop(pastThreshold);
+    }
+    updateBackToTop();
+    window.addEventListener('scroll', updateBackToTop, { passive: true });
+    window.addEventListener('pageshow', updateBackToTop);
+    return () => {
+      window.removeEventListener('scroll', updateBackToTop);
+      window.removeEventListener('pageshow', updateBackToTop);
+    };
+  }, [page]);
+
+  function backToTop() {
+    const heading = mainRef.current?.querySelector('h1');
+    if (heading) {
+      heading.tabIndex = -1;
+      heading.focus({ preventScroll: true });
+    }
+    window.scrollTo({
+      top: 0,
+      behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth',
+    });
+  }
 
   useEffect(() => {
     if (previousPageRef.current === page) return;
@@ -150,6 +256,7 @@ function App() {
 
   return (
     <div className="site">
+      <a className="skip-link" href="#main-content" onClick={() => mainRef.current?.focus({ preventScroll: true })}>Skip to main content</a>
      <header className="nav">
   <a
     className="brand brand-link"
@@ -162,7 +269,7 @@ function App() {
   src={reclaimLogo}
   alt="RECLAIM"
 />
-    
+
   </a>
 
   <nav className="nav-links" aria-label="Main navigation">
@@ -176,10 +283,10 @@ function App() {
       onClick={event => navigate(event, '/get-help')}>Get help</a>
   </nav>
 </header>
-      <main id="main-content">
+      <main id="main-content" ref={mainRef} tabIndex={-1}>
         {page === 'why' ? <WhyItMattersPage onNavigate={navigate} /> : page === 'help' ? <GetHelpPage /> : (
           <>
-        <section className="hero" aria-labelledby="page-title">
+        <section className="hero" aria-labelledby="page-title" data-scroll-reveal>
   <h1 id="page-title">Reclaim</h1>
 
   <p className="lead">
@@ -189,7 +296,7 @@ function App() {
   </p>
 </section>
         <div className="working-layout">
-          <section className="panel controls-panel" aria-labelledby="search-heading">
+          <section className="panel controls-panel" aria-labelledby="search-heading" data-scroll-reveal>
             <div className="panel-head">
               <div>
                 <p className="section-kicker">Discover</p>
@@ -242,7 +349,7 @@ function App() {
             {error && <div className="error" role="alert">{error}</div>}
           </section>
 
-          <section className="panel results-panel" aria-labelledby="results-heading">
+          <section className="panel results-panel" aria-labelledby="results-heading" data-scroll-reveal>
             <div className="panel-head">
               <div>
                 <p className="section-kicker purple">Review</p>
@@ -299,6 +406,11 @@ function App() {
           </>
         )}
       </main>
+      <div className="back-to-top-placement" hidden={!showBackToTop && !backToTopFocused}>
+        <button type="button" className="back-to-top" onClick={backToTop} onFocus={() => setBackToTopFocused(true)} onBlur={() => setBackToTopFocused(false)}>
+          Back to top <span aria-hidden="true">↑</span>
+        </button>
+      </div>
       <footer><span>Reclaim / GDI Hackathon 2026</span><span>Demonstration using safe sample images</span></footer>
     </div>
   );
