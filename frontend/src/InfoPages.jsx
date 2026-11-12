@@ -126,11 +126,11 @@ function ExternalLink({ href, children, className = '', 'aria-label': ariaLabel 
   return <><a href={href} target="_blank" rel="noopener noreferrer" className={className} aria-label={ariaLabel} aria-describedby={descriptionId}>{children} <span aria-hidden="true">↗</span></a><span id={descriptionId} hidden>Opens in a new tab.</span></>;
 }
 
-function InfoHeader({ label, title, subtitle }) {
+function InfoHeader({ label, title, subtitle, revealIntro = false }) {
   return <section className="info-hero" aria-labelledby="info-title">
     <p className="info-eyebrow">{label}</p>
     <h1 id="info-title">{title}</h1>
-    <p className="info-intro">{subtitle}</p>
+    <p className="info-intro" data-scroll-reveal={revealIntro || undefined}>{subtitle}</p>
   </section>;
 }
 
@@ -140,12 +140,12 @@ export function WhyItMattersPage({ onNavigate }) {
 
     <section className="facts-section" aria-label="Five statistics about image-based abuse and online harassment">
       <div className="facts-grid">
-        {STATS.map((stat, i) => <article className="fact-card" key={i}>
+        {STATS.map((stat, i) => <article className="fact-card" key={i} data-scroll-reveal>
           <p className="fact-type">{stat.category}</p>
           <p className="fact-figure">{stat.value}</p>
           <p className="fact-description">{stat.text}<sup><a href={`#source-${i+1}`} aria-label={`Read source ${i+1}`}>{i+1}</a></sup></p>
         </article>)}
-        <article className="fact-card fact-cta">
+        <article className="fact-card fact-cta" data-scroll-reveal>
           <p className="fact-type">Explore the project</p>
           <h2>From awareness to options.</h2>
           <p>See how our demo approaches discovery, review, saving and reporting.</p>
@@ -156,7 +156,7 @@ export function WhyItMattersPage({ onNavigate }) {
     </section>
 
     <section className="panel info-mission" aria-labelledby="mission-title">
-      <div className="info-mission-text">
+      <div className="info-mission-text" data-scroll-reveal>
         <p className="section-kicker purple">About / our mission</p>
         <h2 id="mission-title">Privacy, agency, and practical next steps.</h2>
         <p>Reclaim is a hackathon project exploring how people could find possible image matches, choose what information to keep, and access reporting guidance and support resources.</p>
@@ -182,7 +182,7 @@ export function WhyItMattersPage({ onNavigate }) {
 
 export function GetHelpPage() {
   return <div className="info-page help-page">
-    <InfoHeader label="Get help" title="Support, when you want it." subtitle="Explore emotional support, evidence guidance, content removal, legal information, or optional AI tools. You choose where to begin." />
+    <InfoHeader label="Get help" title="Support, when you want it." subtitle="Explore emotional support, evidence guidance, content removal, legal information, or optional AI tools. You choose where to begin." revealIntro />
 
     <nav className="help-quick-links" aria-label="Choose a kind of help">
       {HELP_GROUPS.map(group => <a key={group.id} href={`#${group.id}`} className="help-quick-link">
@@ -194,7 +194,7 @@ export function GetHelpPage() {
 
     <div className="help-sections">
       {HELP_GROUPS.map(group => <section className="panel help-section" id={group.id} key={group.id} aria-labelledby={`${group.id}-heading`}>
-        <div className="help-section-head">
+        <div className="help-section-head" data-scroll-reveal>
           <span className="help-section-number" aria-hidden="true">{group.number}</span>
           <div>
             <p className="section-kicker purple">{group.eyebrow}</p>
