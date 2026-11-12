@@ -6,7 +6,7 @@
 
 This edition restructures the earlier **React-only** Discovery Lab starter into a **GitHub-ready VS Code monorepo** with a Python backend. It follows the team's whiteboard architecture: input → preprocessing → feature extraction → SHA-256 / pHash / optional computer-vision embeddings → authorized SQLite reference comparison → unified results.
 
-## Visual identity and typography (v0.3)
+## Visual identity and typography (v0.3) 
 
 The frontend has an updated color system: user-selected charcoal `#18181B`, forest green `#14532D`, steel slate `#475569`, ivory `#FAF7F2`, plus an integrated smoky-amethyst and steel-blue system. It uses **Georgia first throughout the interface** with system serif fallbacks. No font downloads, commercial font files, or remote font requests are needed. The body remains approximately 16px; 13px is reserved for supporting metadata. See [`docs/BRAND_SYSTEM.md`](docs/BRAND_SYSTEM.md) for precise tokens, accessibility guidelines, license options, and UX principles. The pHash result range is now selectable (close 0–12, exploratory 0–20). Broad candidates are explicitly unverified and may be false positives.
 
