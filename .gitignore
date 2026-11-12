@@ -1,0 +1,29 @@
+# Python environments and caches
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+# Never push generated local SQLite reference indexes or sensitive materials
+backend/data/
+*.sqlite3
+*.sqlite3-journal
+*.sqlite3-wal
+*.sqlite3-shm
+# JS artifacts
+node_modules/
+frontend/dist/
+# Configuration and secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+# IDE and operating system
+.DS_Store
+.vscode/.ropeproject
+# Never commit even demonstration evidence exports
+*.reclaim
+.venv/
+__pycache__/
+.env
