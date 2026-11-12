@@ -162,7 +162,7 @@ function App() {
   src={reclaimLogo}
   alt="RECLAIM"
 />
-    <span className="brand-name">reclaim</span>
+    
   </a>
 
   <nav className="nav-links" aria-label="Main navigation">
