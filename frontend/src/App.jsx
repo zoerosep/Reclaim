@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { flushSync } from 'react-dom';
 import EvidenceWorkspace from './EvidenceWorkspace.jsx';
 import { WhyItMattersPage, GetHelpPage } from './InfoPages.jsx';
 import reclaimLogo from './assets/reclaim-logo.png';
@@ -17,6 +18,19 @@ function currentRoute() {
 
 function App() {
   const [page, setPage] = useState(currentRoute);
+  const mainRef = useRef(null);
+  const savedEvidenceHeadingRef = useRef(null);
+  const previousPageRef = useRef(page);
+
+  useEffect(() => {
+    if (previousPageRef.current === page) return;
+    previousPageRef.current = page;
+    const heading = mainRef.current?.querySelector('h1');
+    if (heading) {
+      heading.tabIndex = -1;
+      heading.focus({ preventScroll: true });
+    }
+  }, [page]);
 
   useEffect(() => {
     const onPopState = () => setPage(currentRoute());
@@ -40,6 +54,7 @@ function App() {
   const [health, setHealth] = useState(null);
   const [catalog, setCatalog] = useState([]);
   const [methods, setMethods] = useState(['sha256']);
+  const [methodNotice, setMethodNotice] = useState('');
   const [phashScope, setPhashScope] = useState('exploratory');
   const [results, setResults] = useState(null);
   const [queryLabel, setQueryLabel] = useState('');
@@ -71,6 +86,10 @@ function App() {
 
   function toggleMethod(method) {
     setResults(null);
+    setMethodNotice('');
+    if (methods.length === 1 && methods.includes(method)) {
+      window.requestAnimationFrame(() => setMethodNotice('At least one matching method must remain selected.'));
+    }
     setMethods(current => current.includes(method)
       ? (current.length === 1 ? current : current.filter(value => value !== method))
       : [...current, method]);
@@ -79,7 +98,9 @@ function App() {
   async function runSearch(file, label) {
     if (!file || loading) return;
     if (file.size > 8 * 1024 * 1024) {
-      setError('Choose a demo image smaller than 8 MB.'); return;
+      const message = 'Choose a demo image smaller than 8 MB.';
+      if (error === message) flushSync(() => setError(''));
+      setError(message); return;
     }
     setError(''); setLoading(true); setResults(null); setSelectedResult(null);
     try {
@@ -104,6 +125,7 @@ function App() {
   }
 
   async function runDemo(demo) {
+    setError('');
     try {
       const response = await fetch(demo.demo_url);
       if (!response.ok) throw new Error('Demo sample not found.');
@@ -128,6 +150,7 @@ function App() {
 
   return (
     <div className="site">
+      <a className="skip-link" href="#main-content" onClick={() => mainRef.current?.focus({ preventScroll: true })}>Skip to main content</a>
       <header className="nav">
         <a className="brand brand-link" href="/" onClick={event => navigate(event, '/')} aria-label="Reclaim discovery lab, app home">
           <img className="brand-logo" src={reclaimLogo} alt="Reclaim botanical shield logo" />
@@ -142,7 +165,7 @@ function App() {
         <span className="nav-meta">Hackathon demo</span>
       </header>
 
-      <main id="main-content">
+      <main id="main-content" ref={mainRef} tabIndex={-1}>
         {page === 'why' ? <WhyItMattersPage onNavigate={navigate} /> : page === 'help' ? <GetHelpPage /> : (
           <>
         <section className="hero" aria-labelledby="page-title">
@@ -167,8 +190,8 @@ function App() {
 
             <div className="demo-row">
               {(demos.length ? demos : FALLBACK_DEMOS).map(demo => (
-                <button className="demo-option" key={demo.id} onClick={() => runDemo(demo)} disabled={loading || !health || !catalog.length}>
-                  <img src={demo.demo_url} alt={`Sample: ${demo.label}`} />
+                <button className="demo-option" key={demo.id} aria-label={demo.label} onClick={() => runDemo(demo)} disabled={loading || !health || !catalog.length}>
+                  <img src={demo.demo_url} alt="" />
                   <span>{demo.label.split(' ')[0]}</span>
                 </button>
               ))}
@@ -181,7 +204,8 @@ function App() {
 
             <details className="method-details">
               <summary><span>Matching options</span><small>{methodSummary}</small></summary>
-              <div className="methods">
+              <div className="methods" role="group" aria-label="Matching methods" aria-describedby="matching-method-instruction">
+                <span id="matching-method-instruction" hidden>At least one matching method must remain selected.</span>
                 <label className="method">
                   <input type="checkbox" checked={methods.includes('sha256')} onChange={() => toggleMethod('sha256')} />
                   <span><strong>Exact files</strong><small>Look for identical files (SHA-256).</small></span>
@@ -191,6 +215,7 @@ function App() {
                   <span><strong>Similar images</strong><small>Find some resized or compressed copies (pHash).</small></span>
                 </label>
               </div>
+              <span role="status" style={{ position: 'absolute', width: 1, height: 1, padding: 0, margin: -1, overflow: 'hidden', clipPath: 'inset(50%)', whiteSpace: 'nowrap', border: 0 }}>{methodNotice}</span>
               {methods.includes('phash') && (
                 <div className="phash-settings">
                   <label htmlFor="phash-scope">How broad should the comparison be?</label>
@@ -226,23 +251,26 @@ function App() {
                 </div>
                 {results.results.length ? (
                   <div className="result-list">
-                    {results.results.map(item => (
+                    {results.results.map((item, index) => (
                       <article className="result" key={item.id}>
-                        <div className="result-thumb"><img src={item.demo_url} alt={`Demo reference: ${item.label}`} /></div>
+                        <div className="result-thumb"><img src={item.demo_url} alt="" /></div>
                         <div className="result-body">
                           <span className={`verdict ${item.exact ? 'exact' : item.phash_tier === 'exploratory' ? 'low' : 'possible'}`}>
                             {item.exact ? 'Exact file' : item.phash_tier === 'close' ? 'Close visual match' : 'Possible visual match'}
                           </span>
-                          <h4>{item.label}</h4>
+                          <h3>{item.label}</h3>
                           <details className="match-details"><summary>Match details</summary>
                             <p>Methods: {item.matching_methods.join(', ')}</p>
                             {item.phash_distance != null && <p>pHash distance: {item.phash_distance} of 64</p>}
                             {item.openclip_cosine != null && <p>Embedding similarity: {item.openclip_cosine}</p>}
                             <p>Reference type: {item.kind}</p>
                           </details>
-                          <button className="save-result-button" onClick={() => {
+                          <button className="save-result-button" aria-label={`Save to vault: result ${index + 1}`} onClick={() => {
                             setSelectedResult(item);
-                            window.requestAnimationFrame(() => document.getElementById('evidence-workspace')?.scrollIntoView({ behavior: 'smooth' }));
+                            window.requestAnimationFrame(() => {
+                              document.getElementById('evidence-workspace')?.scrollIntoView({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth' });
+                              savedEvidenceHeadingRef.current?.focus({ preventScroll: true });
+                            });
                           }}>Save to vault <span aria-hidden="true">↓</span></button>
                         </div>
                       </article>
@@ -257,7 +285,7 @@ function App() {
           </section>
         </div>
 
-        <EvidenceWorkspace selectedResult={selectedResult} queryLabel={queryLabel} clearSelection={() => setSelectedResult(null)} />
+        <EvidenceWorkspace selectedResult={selectedResult} queryLabel={queryLabel} clearSelection={() => setSelectedResult(null)} savedEvidenceHeadingRef={savedEvidenceHeadingRef} />
           </>
         )}
       </main>

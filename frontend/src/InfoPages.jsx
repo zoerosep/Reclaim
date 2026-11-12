@@ -1,3 +1,5 @@
+import { useId } from 'react';
+
 // Separate, informational pages. No uploaded files or search results are sent from these pages.
 // Sources and support organizations were checked on November 11, 2026.
 const STATS = [
@@ -119,8 +121,9 @@ const HELP_GROUPS = [
   },
 ];
 
-function ExternalLink({ href, children, className = '' }) {
-  return <a href={href} target="_blank" rel="noopener noreferrer" className={className}>{children} <span aria-hidden="true">↗</span></a>;
+function ExternalLink({ href, children, className = '', 'aria-label': ariaLabel }) {
+  const descriptionId = useId();
+  return <><a href={href} target="_blank" rel="noopener noreferrer" className={className} aria-label={ariaLabel} aria-describedby={descriptionId}>{children} <span aria-hidden="true">↗</span></a><span id={descriptionId} hidden>Opens in a new tab.</span></>;
 }
 
 function InfoHeader({ label, title, subtitle }) {
@@ -203,7 +206,7 @@ export function GetHelpPage() {
           <span className="resource-tag">{resource.tag}</span>
           <h3>{resource.name}</h3>
           <p>{resource.detail}</p>
-          <ExternalLink href={resource.url} className="resource-link">Visit resource</ExternalLink>
+          <ExternalLink href={resource.url} className="resource-link" aria-label={`Visit resource: ${resource.name}`}>Visit resource</ExternalLink>
         </article>)}</div>
       </section>)}
     </div>
