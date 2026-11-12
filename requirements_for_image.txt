@@ -1,0 +1,51 @@
+Hey everyone! A few setup and usage notes for the Python image-processing engine:
+
+**1. Local execution**
+
+The image processor runs locally on your machine. It uses ExifTool for metadata extraction, so make sure you've downloaded and configured it according to your operating system. I've already shared the ExifTool download link in the Slack channel.
+
+Verify the installation with:
+
+```bash
+exiftool -ver
+```
+
+**2. Python dependencies**
+
+Activate your virtual environment and install the required modules:
+
+```bash
+pip install Pillow opencv-python numpy ImageHash requests python-dotenv
+```
+
+**3. Uploading test images**
+
+To run image processing and similarity comparisons:
+
+- Place your test images inside the `image-engine/test_images/` folder.
+- Open `main.py`.
+- Update the `image_path` variable with the exact filename of your uploaded image.
+- Run the processor using:
+
+```bash
+python main.py
+```
+
+**4. Unsplash integration**
+
+The processor currently retrieves Unsplash images based on the category you enter, such as `portrait`, `nature`, `landscape` or `architecture`.
+
+- By default, the search can retrieve 10 results.
+- The search pool can be increased to 50 images using two API pages.
+- The Unsplash API has a demo limit of 50 API requests per hour.
+- The API Access Key has been shared with Zoe.
+
+For the MVP, please use images sourced from Unsplash for the controlled test collection rather than uploading real user-sensitive images.
+
+**5. How the matching works**
+
+The processor generates pHash, dHash and aHash fingerprints for the uploaded image. It then compares the pHash against the retrieved Unsplash test images and produces a ranked report containing similarity scores, image URLs, photographer details and source links.
+
+One distinction: these scores indicate perceptual visual similarity, not verified identity or recognition.&#x20;
+
+That's everything needed to get the Python image processor running locally. Let me know if anyone runs into setup issues!
