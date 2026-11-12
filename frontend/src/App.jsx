@@ -59,13 +59,11 @@ function App() {
       revealWithoutMotion(event.target.closest('[data-scroll-reveal]'));
     }
     function skipAnchorReveal(hash) {
-      if (page !== 'help' || !hash) return;
+      if (!hash) return;
       let id;
       try { id = decodeURIComponent(hash.slice(1)); } catch { return; }
       const destination = document.getElementById(id);
-      if (destination?.matches('.help-section')) {
-        revealWithoutMotion(destination.querySelector('.help-section-head[data-scroll-reveal]'));
-      }
+      revealWithoutMotion(destination?.closest('[data-scroll-reveal]'));
     }
     function onAnchorClick(event) {
       if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
@@ -259,35 +257,46 @@ function App() {
   return (
     <div className="site">
       <a className="skip-link" href="#main-content" onClick={() => mainRef.current?.focus({ preventScroll: true })}>Skip to main content</a>
-      <header className="nav">
-        <a className="brand brand-link" href="/" onClick={event => navigate(event, '/')} aria-label="Reclaim discovery lab, app home">
-          <img className="brand-logo" src={reclaimLogo} alt="Reclaim botanical shield logo" />
-          <span className="brand-divider" aria-hidden="true">/</span>
-          <span className="brand-sub">discovery lab</span>
-        </a>
-        <nav className="nav-links" aria-label="Main navigation">
-          <a href="/" aria-current={page === 'app' ? 'page' : undefined} onClick={event => navigate(event, '/')}>App</a>
-          <a href="/why-it-matters" aria-current={page === 'why' ? 'page' : undefined} onClick={event => navigate(event, '/why-it-matters')}>Why it matters</a>
-          <a href="/get-help" aria-current={page === 'help' ? 'page' : undefined} onClick={event => navigate(event, '/get-help')}>Get help</a>
-        </nav>
-        <span className="nav-meta">Hackathon demo</span>
-      </header>
+     <header className="nav">
+  <a
+    className="brand brand-link"
+    href="/"
+    onClick={event => navigate(event, '/')}
+    aria-label="Reclaim home"
+  >
+    <img
+  className="brand-logo"
+  src={reclaimLogo}
+  alt="RECLAIM"
+/>
+    <span className="brand-name">reclaim</span>
+  </a>
 
+  <nav className="nav-links" aria-label="Main navigation">
+    <a href="/" aria-current={page === 'app' ? 'page' : undefined}
+      onClick={event => navigate(event, '/')}>App</a>
+    <a href="/why-it-matters"
+      aria-current={page === 'why' ? 'page' : undefined}
+      onClick={event => navigate(event, '/why-it-matters')}>Why it matters</a>
+    <a href="/get-help"
+      aria-current={page === 'help' ? 'page' : undefined}
+      onClick={event => navigate(event, '/get-help')}>Get help</a>
+  </nav>
+</header>
       <main id="main-content" ref={mainRef} tabIndex={-1}>
         {page === 'why' ? <WhyItMattersPage onNavigate={navigate} /> : page === 'help' ? <GetHelpPage /> : (
           <>
-        <section className="hero" aria-labelledby="page-title">
-          <h1 id="page-title">Reclaim - GDI Hackathon 2026</h1>
-          <p className="lead" data-scroll-reveal>Explore how survivors could find possible image matches, keep selected findings together, and choose what happens next. Privacy and choice come first.</p>
-          <div className="workflow-key" aria-label="The Reclaim process" data-scroll-reveal>
-            <span className="discovery"><b>01</b> Discover</span>
-            <span className="review"><b>02</b> Review</span>
-            <span className="future"><b>03</b> Save &amp; report</span>
-          </div>
-        </section>
+        <section className="hero" aria-labelledby="page-title" data-scroll-reveal>
+  <h1 id="page-title">Reclaim</h1>
 
+  <p className="lead">
+    Helping survivors regain control of their digital lives
+    with privacy, support, and the freedom to choose what
+    happens next.
+  </p>
+</section>
         <div className="working-layout">
-          <section className="panel controls-panel" aria-labelledby="search-heading">
+          <section className="panel controls-panel" aria-labelledby="search-heading" data-scroll-reveal>
             <div className="panel-head">
               <div>
                 <p className="section-kicker">Discover</p>
@@ -340,7 +349,7 @@ function App() {
             {error && <div className="error" role="alert">{error}</div>}
           </section>
 
-          <section className="panel results-panel" aria-labelledby="results-heading">
+          <section className="panel results-panel" aria-labelledby="results-heading" data-scroll-reveal>
             <div className="panel-head">
               <div>
                 <p className="section-kicker purple">Review</p>

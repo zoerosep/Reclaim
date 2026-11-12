@@ -126,11 +126,11 @@ function ExternalLink({ href, children, className = '', 'aria-label': ariaLabel 
   return <><a href={href} target="_blank" rel="noopener noreferrer" className={className} aria-label={ariaLabel} aria-describedby={descriptionId}>{children} <span aria-hidden="true">↗</span></a><span id={descriptionId} hidden>Opens in a new tab.</span></>;
 }
 
-function InfoHeader({ label, title, subtitle, revealIntro = false }) {
-  return <section className="info-hero" aria-labelledby="info-title">
+function InfoHeader({ label, title, subtitle }) {
+  return <section className="info-hero" aria-labelledby="info-title" data-scroll-reveal>
     <p className="info-eyebrow">{label}</p>
     <h1 id="info-title">{title}</h1>
-    <p className="info-intro" data-scroll-reveal={revealIntro || undefined}>{subtitle}</p>
+    <p className="info-intro">{subtitle}</p>
   </section>;
 }
 
@@ -155,8 +155,8 @@ export function WhyItMattersPage({ onNavigate }) {
       <p className="facts-caveat">These figures come from different surveys and measure different experiences. The first two concern nonconsensual intimate-image distribution; the other three concern online harassment more broadly.</p>
     </section>
 
-    <section className="panel info-mission" aria-labelledby="mission-title">
-      <div className="info-mission-text" data-scroll-reveal>
+    <section className="panel info-mission" aria-labelledby="mission-title" data-scroll-reveal>
+      <div className="info-mission-text">
         <p className="section-kicker purple">About / our mission</p>
         <h2 id="mission-title">Privacy, agency, and practical next steps.</h2>
         <p>Reclaim is a hackathon project exploring how people could find possible image matches, choose what information to keep, and access reporting guidance and support resources.</p>
@@ -169,7 +169,7 @@ export function WhyItMattersPage({ onNavigate }) {
       </aside>
     </section>
 
-    <section className="panel source-section" aria-labelledby="sources-title">
+    <section className="panel source-section" aria-labelledby="sources-title" data-scroll-reveal>
       <p className="section-kicker steel">Research & reading</p>
       <h2 id="sources-title">Sources</h2>
       <ol className="source-list">{STATS.map((stat, i) => <li id={`source-${i+1}`} key={i}>
@@ -182,10 +182,10 @@ export function WhyItMattersPage({ onNavigate }) {
 
 export function GetHelpPage() {
   return <div className="info-page help-page">
-    <InfoHeader label="Get help" title="Support, when you want it." subtitle="Explore emotional support, evidence guidance, content removal, legal information, or optional AI tools. You choose where to begin." revealIntro />
+    <InfoHeader label="Get help" title="Support, when you want it." subtitle="Explore emotional support, evidence guidance, content removal, legal information, or optional AI tools. You choose where to begin." />
 
     <nav className="help-quick-links" aria-label="Choose a kind of help">
-      {HELP_GROUPS.map(group => <a key={group.id} href={`#${group.id}`} className="help-quick-link">
+      {HELP_GROUPS.map(group => <a key={group.id} href={`#${group.id}`} className="help-quick-link" data-scroll-reveal>
         <span className="help-quick-number">{group.number}</span>
         <span>{group.navLabel}</span>
         <span className="help-quick-arrow" aria-hidden="true">↓</span>
@@ -193,8 +193,8 @@ export function GetHelpPage() {
     </nav>
 
     <div className="help-sections">
-      {HELP_GROUPS.map(group => <section className="panel help-section" id={group.id} key={group.id} aria-labelledby={`${group.id}-heading`}>
-        <div className="help-section-head" data-scroll-reveal>
+      {HELP_GROUPS.map(group => <section className="panel help-section" id={group.id} key={group.id} aria-labelledby={`${group.id}-heading`} data-scroll-reveal>
+        <div className="help-section-head">
           <span className="help-section-number" aria-hidden="true">{group.number}</span>
           <div>
             <p className="section-kicker purple">{group.eyebrow}</p>
