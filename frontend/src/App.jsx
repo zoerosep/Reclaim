@@ -150,34 +150,44 @@ function App() {
 
   return (
     <div className="site">
-      <a className="skip-link" href="#main-content" onClick={() => mainRef.current?.focus({ preventScroll: true })}>Skip to main content</a>
-      <header className="nav">
-        <a className="brand brand-link" href="/" onClick={event => navigate(event, '/')} aria-label="Reclaim discovery lab, app home">
-          <img className="brand-logo" src={reclaimLogo} alt="Reclaim botanical shield logo" />
-          <span className="brand-divider" aria-hidden="true">/</span>
-          <span className="brand-sub">discovery lab</span>
-        </a>
-        <nav className="nav-links" aria-label="Main navigation">
-          <a href="/" aria-current={page === 'app' ? 'page' : undefined} onClick={event => navigate(event, '/')}>App</a>
-          <a href="/why-it-matters" aria-current={page === 'why' ? 'page' : undefined} onClick={event => navigate(event, '/why-it-matters')}>Why it matters</a>
-          <a href="/get-help" aria-current={page === 'help' ? 'page' : undefined} onClick={event => navigate(event, '/get-help')}>Get help</a>
-        </nav>
-        <span className="nav-meta">Hackathon demo</span>
-      </header>
+     <header className="nav">
+  <a
+    className="brand brand-link"
+    href="/"
+    onClick={event => navigate(event, '/')}
+    aria-label="Reclaim home"
+  >
+    <img
+  className="brand-logo"
+  src={reclaimLogo}
+  alt="RECLAIM"
+/>
+    <span className="brand-name">reclaim</span>
+  </a>
 
-      <main id="main-content" ref={mainRef} tabIndex={-1}>
+  <nav className="nav-links" aria-label="Main navigation">
+    <a href="/" aria-current={page === 'app' ? 'page' : undefined}
+      onClick={event => navigate(event, '/')}>App</a>
+    <a href="/why-it-matters"
+      aria-current={page === 'why' ? 'page' : undefined}
+      onClick={event => navigate(event, '/why-it-matters')}>Why it matters</a>
+    <a href="/get-help"
+      aria-current={page === 'help' ? 'page' : undefined}
+      onClick={event => navigate(event, '/get-help')}>Get help</a>
+  </nav>
+</header>
+      <main id="main-content">
         {page === 'why' ? <WhyItMattersPage onNavigate={navigate} /> : page === 'help' ? <GetHelpPage /> : (
           <>
         <section className="hero" aria-labelledby="page-title">
-          <h1 id="page-title">Reclaim - GDI Hackathon 2026</h1>
-          <p className="lead">Explore how survivors could find possible image matches, keep selected findings together, and choose what happens next. Privacy and choice come first.</p>
-          <div className="workflow-key" aria-label="The Reclaim process">
-            <span className="discovery"><b>01</b> Discover</span>
-            <span className="review"><b>02</b> Review</span>
-            <span className="future"><b>03</b> Save &amp; report</span>
-          </div>
-        </section>
+  <h1 id="page-title">Reclaim</h1>
 
+  <p className="lead">
+    Helping survivors regain control of their digital lives
+    with privacy, support, and the freedom to choose what
+    happens next.
+  </p>
+</section>
         <div className="working-layout">
           <section className="panel controls-panel" aria-labelledby="search-heading">
             <div className="panel-head">

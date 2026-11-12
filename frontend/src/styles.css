@@ -1,4 +1,4 @@
-/* RECLAIM — GDI Hackathon 2026
+/* RECLAIM â€” GDI Hackathon 2026
  * Dark, quiet interface. Georgia first; no external font service required.
  * UI only: this stylesheet does not change image processing or storage.
  */
@@ -59,19 +59,60 @@ a:hover { color: var(--ivory); }
 }
 
 /* A restrained identity: the supplied logo is used as an image, not redrawn. */
-.nav { min-height: 110px; display: flex; align-items: center; justify-content: space-between; gap: 1.25rem; padding: 13px clamp(18px, 4vw, 60px); background: #18191D; border-bottom: 1px solid var(--border-quiet); }
-.brand { display: flex; align-items: center; gap: 16px; min-width: 0; }
-.brand-link { text-decoration: none; color: var(--text); }
-.brand-link:hover { color: var(--text); }
-.nav-links { display: flex; align-items: center; justify-content: center; gap: clamp(12px, 2.8vw, 38px); flex-wrap: wrap; margin-left: auto; }
-.nav-links a { color: var(--muted); text-decoration: none; font-size: .94rem; padding: 12px 3px; border-bottom: 2px solid transparent; white-space: nowrap; }
-.nav-links a:hover { color: var(--text); }
-.nav-links a[aria-current="page"] { color: var(--text); border-color: #9983AA; }
-.nav-meta { margin-left: clamp(6px, 2vw, 26px); }
-.brand-logo { width: 153px; height: 96px; object-fit: contain; background: #FAF7F2; border-radius: 6px; display: block; }
-.brand-divider { color: var(--violet-light); font: 400 1.9rem/1 var(--font-editorial); }
-.brand-sub { font-size: .98rem; color: #EEE8F1; white-space: nowrap; letter-spacing: .015em; }
-.nav-meta { color: var(--subtle); font-size: var(--size-meta); border: 1px solid var(--border); border-radius: 999px; padding: .4rem .8rem; white-space: nowrap; }
+/* RECLAIM brand */
+.nav {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+
+  min-height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.25rem;
+  padding: 13px clamp(18px, 4vw, 60px);
+
+  background: rgba(24, 25, 29, 0.97);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+
+  border-bottom: 1px solid var(--border-quiet);
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.2);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
+}
+
+.brand-link {
+  text-decoration: none;
+  color: var(--text);
+}
+
+.brand-link:hover {
+  color: var(--text);
+}
+
+.brand-logo {
+  width: 78px;
+  height: 78px;
+  object-fit: contain;
+  background: transparent;
+  display: block;
+}
+
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(12px, 2.8vw, 38px);
+  flex-wrap: wrap;
+  margin-left: auto;
+}
 
 main { max-width: 1320px; padding: 0 clamp(18px, 4vw, 54px) 72px; margin: 0 auto; }
 .hero { max-width: 1080px; padding: 60px 0 39px; margin: 0 auto; text-align: center; }
@@ -110,7 +151,7 @@ main { max-width: 1320px; padding: 0 clamp(18px, 4vw, 54px) 72px; margin: 0 auto
 .method-details > summary { display: flex; align-items: baseline; justify-content: space-between; gap: 13px; list-style: none; color: var(--text); font-size: var(--size-interface); }
 .method-details > summary::-webkit-details-marker { display: none; }
 .method-details > summary::before { content: '+'; color: var(--violet-light); font: 700 1.25rem/1 Georgia,serif; margin-right: 2px; }
-.method-details[open] > summary::before { content: '−'; }
+.method-details[open] > summary::before { content: 'âˆ’'; }
 .method-details > summary span { margin-right: auto; }
 .method-details > summary small { color: var(--subtle); font-size: var(--size-meta); }
 .methods { display: grid; gap: 8px; padding-top: 16px; }
@@ -280,10 +321,7 @@ select:focus-visible, input:focus-visible, textarea:focus-visible { outline-colo
   .fact-card { min-height: unset; }
 
   .brand { gap: 10px; }
-  .brand-logo { width: 106px; height: 73px; }
-  .brand-sub { font-size: .83rem; }
-  .brand-divider { font-size: 1.3rem; }
-  .nav-meta { display: none; }
+  .brand-logo { width: 68px; height: 68px; }
   main { padding: 0 16px 48px; }
   .hero { padding: 38px 0 30px; }
   .hero h1 { font-size: clamp(2rem, 8vw, 2.65rem); }
@@ -301,8 +339,7 @@ select:focus-visible, input:focus-visible, textarea:focus-visible { outline-colo
   .site footer { display: grid; }
 }
 @media (max-width: 380px) {
-  .brand-logo { width: 88px; height: 60px; }
-  .brand-sub { white-space: normal; }
+  .brand-logo { width: 58px; height: 58px; }
   .demo-option span { padding: 8px 7px 0; font-size: .82rem; }
   .method-details > summary { flex-wrap: wrap; }
   .result { grid-template-columns: 1fr; }
@@ -310,5 +347,4 @@ select:focus-visible, input:focus-visible, textarea:focus-visible { outline-colo
 }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
-  .loading-ring { animation: none !important; }
 }
