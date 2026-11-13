@@ -182,7 +182,7 @@ export function WhyItMattersPage({ onNavigate }) {
 
 export function GetHelpPage() {
   return <div className="info-page help-page">
-    <InfoHeader label="Get help" title="Support, when you want it." subtitle="Explore emotional support, evidence guidance, content removal, legal information, or optional AI tools. You choose where to begin." />
+    <InfoHeader label="Get help" title="Support when you want it." subtitle="Explore emotional support, evidence guidance, content removal, legal information, or optional AI tools. You choose where to begin." />
 
     <nav className="help-quick-links" aria-label="Choose a kind of help" data-scroll-reveal>
       {HELP_GROUPS.map(group => <a key={group.id} href={`#${group.id}`} className="help-quick-link">
