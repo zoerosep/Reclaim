@@ -126,9 +126,8 @@ function ExternalLink({ href, children, className = '', 'aria-label': ariaLabel 
   return <><a href={href} target="_blank" rel="noopener noreferrer" className={className} aria-label={ariaLabel} aria-describedby={descriptionId}>{children} <span aria-hidden="true">↗</span></a><span id={descriptionId} hidden>Opens in a new tab.</span></>;
 }
 
-function InfoHeader({ label, title, subtitle }) {
+function InfoHeader({ title, subtitle }) {
   return <section className="info-hero" aria-labelledby="info-title" data-scroll-reveal>
-    <p className="info-eyebrow">{label}</p>
     <h1 id="info-title">{title}</h1>
     <p className="info-intro">{subtitle}</p>
   </section>;
@@ -136,7 +135,7 @@ function InfoHeader({ label, title, subtitle }) {
 
 export function WhyItMattersPage({ onNavigate }) {
   return <div className="info-page">
-    <InfoHeader label="Why it matters" title="Why Reclaim matters" subtitle="Nonconsensual image sharing can reach far beyond the original post. Understanding the scope is one part of making tools and support easier to find." />
+    <InfoHeader title="Why Reclaim matters" subtitle="Nonconsensual image sharing can reach far beyond the original post. Understanding the scope is one part of making tools and support easier to find." />
 
     <section className="facts-section" aria-label="Five statistics about image-based abuse and online harassment">
       <div className="facts-grid" data-scroll-reveal>
@@ -182,7 +181,7 @@ export function WhyItMattersPage({ onNavigate }) {
 
 export function GetHelpPage() {
   return <div className="info-page help-page">
-    <InfoHeader label="Get help" title="Support when you want it." subtitle="Explore emotional support, evidence guidance, content removal, legal information, or optional AI tools. You choose where to begin." />
+    <InfoHeader title="Support when you want it." subtitle="Explore emotional support, evidence guidance, content removal, legal information, or optional AI tools. You choose where to begin." />
 
     <nav className="help-quick-links" aria-label="Choose a kind of help" data-scroll-reveal>
       {HELP_GROUPS.map(group => <a key={group.id} href={`#${group.id}`} className="help-quick-link">
