@@ -22,8 +22,3 @@ frontend/dist/
 # IDE and operating system
 .DS_Store
 .vscode/.ropeproject
-# Never commit even demonstration evidence exports
-*.reclaim
-.venv/
-__pycache__/
-.env

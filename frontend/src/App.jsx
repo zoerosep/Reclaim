@@ -1,11 +1,4 @@
-import { useEffect, useLayoutEffect, useRef, useState } from 'react';
-import { flushSync } from 'react-dom';
-import EvidenceWorkspace from './EvidenceWorkspace.jsx';
-import SearchSource from './SearchSource.jsx';
-import SelfSearch from './SelfSearch.jsx';
-import ImageDetails from './ImageDetails.jsx';
-import { WhyItMattersPage, GetHelpPage } from './InfoPages.jsx';
-import reclaimLogo from './assets/reclaim-logo.png';
+import { useEffect, useRef, useState } from 'react';
 
 const FALLBACK_DEMOS = [
   { id: 'garden-original', label: 'Garden original', demo_url: '/samples/garden-original.png' },
@@ -13,166 +6,13 @@ const FALLBACK_DEMOS = [
   { id: 'shapes-original', label: 'Shapes original', demo_url: '/samples/shapes-original.png' },
 ];
 
-function currentRoute() {
-  if (window.location.pathname === '/why-it-matters') return 'why';
-  if (window.location.pathname === '/get-help') return 'help';
-  return 'app';
-}
-
 function App() {
-  const [page, setPage] = useState(currentRoute);
-  const mainRef = useRef(null);
-  const savedEvidenceHeadingRef = useRef(null);
-  const previousPageRef = useRef(page);
-  const [showBackToTop, setShowBackToTop] = useState(false);
-  const [backToTopFocused, setBackToTopFocused] = useState(false);
-  const pastScrollThresholdRef = useRef(false);
-
-  useLayoutEffect(() => {
-    const main = mainRef.current;
-    if (!main?.animate || !window.IntersectionObserver) return;
-    const motionPreference = window.matchMedia('(prefers-reduced-motion: reduce)');
-    if (motionPreference.matches) return;
-    const revealed = new WeakSet();
-    const animations = new Map();
-    let stopped = false;
-    const observer = new IntersectionObserver(entries => {
-      if (stopped) return;
-      entries.forEach(({ target, isIntersecting }) => {
-        if (!isIntersecting || revealed.has(target)) return;
-        revealed.add(target);
-        observer.unobserve(target);
-        if (target.contains(document.activeElement)) return;
-        const animation = target.animate(
-          [{ transform: 'translateY(8px)', opacity: 0.96 }, { transform: 'translateY(0)', opacity: 1 }],
-          { duration: 1200, easing: 'ease-in-out' },
-        );
-        animations.set(target, animation);
-        animation.onfinish = () => animations.delete(target);
-      });
-    });
-    function revealWithoutMotion(target) {
-      if (!target || !main.contains(target)) return;
-      revealed.add(target);
-      observer.unobserve(target);
-      animations.get(target)?.cancel();
-      animations.delete(target);
-    }
-    function onCardFocus(event) {
-      revealWithoutMotion(event.target.closest('[data-scroll-reveal]'));
-    }
-    function skipAnchorReveal(hash) {
-      if (!hash) return;
-      let id;
-      try { id = decodeURIComponent(hash.slice(1)); } catch { return; }
-      const destination = document.getElementById(id);
-      revealWithoutMotion(destination?.closest('[data-scroll-reveal]'));
-    }
-    function onAnchorClick(event) {
-      if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
-      const link = event.target.closest('a[href^="#"]');
-      if (link) skipAnchorReveal(link.hash);
-    }
-    function onHashChange() {
-      skipAnchorReveal(window.location.hash);
-    }
-    function stopReveals() {
-      stopped = true;
-      observer.disconnect();
-      animations.forEach(animation => animation.cancel());
-      animations.clear();
-    }
-    function onMotionPreferenceChange(event) {
-      if (event.matches) stopReveals();
-    }
-    onHashChange();
-    main.querySelectorAll('[data-scroll-reveal]').forEach(card => {
-      if (card.contains(document.activeElement)) revealed.add(card);
-      else if (!revealed.has(card)) observer.observe(card);
-    });
-    main.addEventListener('focusin', onCardFocus);
-    main.addEventListener('click', onAnchorClick);
-    window.addEventListener('hashchange', onHashChange);
-    motionPreference.addEventListener('change', onMotionPreferenceChange);
-    return () => {
-      stopReveals();
-      main.removeEventListener('focusin', onCardFocus);
-      main.removeEventListener('click', onAnchorClick);
-      window.removeEventListener('hashchange', onHashChange);
-      motionPreference.removeEventListener('change', onMotionPreferenceChange);
-    };
-  }, [page]);
-
-  useEffect(() => {
-    function updateBackToTop() {
-      const pastThreshold = window.scrollY >= 400;
-      if (pastThreshold === pastScrollThresholdRef.current) return;
-      pastScrollThresholdRef.current = pastThreshold;
-      setShowBackToTop(pastThreshold);
-    }
-    updateBackToTop();
-    window.addEventListener('scroll', updateBackToTop, { passive: true });
-    window.addEventListener('pageshow', updateBackToTop);
-    return () => {
-      window.removeEventListener('scroll', updateBackToTop);
-      window.removeEventListener('pageshow', updateBackToTop);
-    };
-  }, [page]);
-
-  function backToTop() {
-    const heading = mainRef.current?.querySelector('h1');
-    if (heading) {
-      heading.tabIndex = -1;
-      heading.focus({ preventScroll: true });
-    }
-    window.scrollTo({
-      top: 0,
-      behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth',
-    });
-  }
-
-  useEffect(() => {
-    if (previousPageRef.current === page) return;
-    previousPageRef.current = page;
-    const heading = mainRef.current?.querySelector('h1');
-    if (heading) {
-      heading.tabIndex = -1;
-      heading.focus({ preventScroll: true });
-    }
-  }, [page]);
-
-  useEffect(() => {
-    const onPopState = () => setPage(currentRoute());
-    window.addEventListener('popstate', onPopState);
-    return () => window.removeEventListener('popstate', onPopState);
-  }, []);
-
-  useEffect(() => {
-    document.title = page === 'why' ? 'Why it matters | Reclaim'
-      : page === 'help' ? 'Get help | Reclaim'
-      : 'Reclaim | Discovery lab';
-  }, [page]);
-
-  function navigate(event, destination) {
-    if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
-    event.preventDefault();
-    if (window.location.pathname !== destination) window.history.pushState({}, '', destination);
-    setPage(currentRoute());
-    window.scrollTo({ top: 0, behavior: 'instant' });
-  }
   const [health, setHealth] = useState(null);
   const [catalog, setCatalog] = useState([]);
-  const [methods, setMethods] = useState(['sha256']);
-  const [methodNotice, setMethodNotice] = useState('');
-  const [phashScope, setPhashScope] = useState('exploratory');
-  const [source, setSource] = useState('local'); // 'local' sample library or 'unsplash' test photos
-  const [category, setCategory] = useState('portrait');
-  const [analysis, setAnalysis] = useState(null); // image-processor report for the searched image
+  const [methods, setMethods] = useState(['sha256', 'phash']);
   const [results, setResults] = useState(null);
   const [queryLabel, setQueryLabel] = useState('');
-  const [selectedResult, setSelectedResult] = useState(null);
-  // Counts requests to open the "add a record by hand" form in the vault.
-  const [addByHandRequest, setAddByHandRequest] = useState(0);
+  const [review, setReview] = useState({});
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const picker = useRef(null);
@@ -187,10 +27,8 @@ function App() {
         ]);
         if (!status.ok || !references.ok) throw new Error('The Python API is not available. Start the backend in VS Code first.');
         if (active) {
-          const rows = await references.json();
           setHealth(await status.json());
-          setCatalog(rows);
-          if (!rows.length) setError('The sample image library is empty. Stop the Python backend, run "python -m backend.scripts.seed_demo" from the project folder, then start it again.');
+          setCatalog(await references.json());
         }
       } catch {
         if (active) setError('Python backend not connected. Check that Uvicorn is running on localhost:8000 and that you seeded the demo catalog.');
@@ -202,10 +40,6 @@ function App() {
 
   function toggleMethod(method) {
     setResults(null);
-    setMethodNotice('');
-    if (methods.length === 1 && methods.includes(method)) {
-      window.requestAnimationFrame(() => setMethodNotice('At least one matching method must remain selected.'));
-    }
     setMethods(current => current.includes(method)
       ? (current.length === 1 ? current : current.filter(value => value !== method))
       : [...current, method]);
@@ -214,33 +48,21 @@ function App() {
   async function runSearch(file, label) {
     if (!file || loading) return;
     if (file.size > 8 * 1024 * 1024) {
-      const message = 'Choose a demo image smaller than 8 MB.';
-      if (error === message) flushSync(() => setError(''));
-      setError(message); return;
+      setError('Choose a demo image smaller than 8 MB.'); return;
     }
-    setError(''); setLoading(true); setResults(null); setSelectedResult(null); setAnalysis(null);
+    setError(''); setLoading(true); setResults(null); setReview({});
     try {
-      const upload = {
+      const response = await fetch(`/api/search?methods=${encodeURIComponent(methods.join(','))}`, {
         method: 'POST',
         headers: { 'Content-Type': file.type || 'application/octet-stream' },
         body: file, // image data is sent to the LOCAL Python backend, not a public search site
         cache: 'no-store',
-      };
-      const searchUrl = useUnsplash
-        ? `/api/search/unsplash?${new URLSearchParams({ category, phash_scope: phashScope })}`
-        : `/api/search?${new URLSearchParams({ methods: methods.join(','), phash_scope: phashScope })}`;
-      // The search and the image-processor report run side by side. A problem
-      // with the report never hides the search results.
-      const [response, report] = await Promise.all([
-        fetch(searchUrl, upload),
-        fetch('/api/analyze', upload).then(reply => (reply.ok ? reply.json() : { status: 'failed' })).catch(() => ({ status: 'failed' })),
-      ]);
+      });
       if (!response.ok) {
         const details = await response.json().catch(() => null);
         throw new Error(details?.detail || `Search failed with HTTP ${response.status}`);
       }
       setResults(await response.json());
-      setAnalysis(report);
       setQueryLabel(label);
     } catch (err) {
       setError(err.message || 'The search could not finish.');
@@ -250,7 +72,6 @@ function App() {
   }
 
   async function runDemo(demo) {
-    setError('');
     try {
       const response = await fetch(demo.demo_url);
       if (!response.ok) throw new Error('Demo sample not found.');
@@ -268,183 +89,80 @@ function App() {
   }
 
   const demos = catalog.filter(c => FALLBACK_DEMOS.some(d => d.id === c.id));
+  const available = health?.methods || ['sha256', 'phash'];
 
-  // Unsplash test photos are compared by visual similarity (pHash) only.
-  const useUnsplash = source === 'unsplash' && Boolean(health?.unsplash?.available);
-  const cannotSearch = loading || !health || (!useUnsplash && !catalog.length);
-  const fromUnsplash = results?.source === 'unsplash';
-
-  const methodSummary = useUnsplash ? 'Similar images'
-    : methods.includes('phash')
-    ? (methods.includes('sha256') ? 'Exact + similar images' : 'Similar images')
-    : 'Exact files';
-
-  return (
-    <div className="site">
-      <a className="skip-link" href="#main-content" onClick={() => mainRef.current?.focus({ preventScroll: true })}>Skip to main content</a>
-      <header className="nav">
-        <a
-          className="brand brand-link"
-          href="/"
-          onClick={event => navigate(event, '/')}
-          aria-label="Reclaim home"
-        >
-          <img className="brand-logo" src={reclaimLogo} alt="RECLAIM" />
-        </a>
-
-        <span className="nav-wordmark">Reclaim</span>
-
-        <nav className="nav-links" aria-label="Main navigation">
-          <a href="/" aria-current={page === 'app' ? 'page' : undefined} onClick={event => navigate(event, '/')}>App</a>
-          <a href="/why-it-matters" aria-current={page === 'why' ? 'page' : undefined} onClick={event => navigate(event, '/why-it-matters')}>Why it matters</a>
-          <a href="/get-help" aria-current={page === 'help' ? 'page' : undefined} onClick={event => navigate(event, '/get-help')}>Get help</a>
-        </nav>
-      </header>
-      <main id="main-content" ref={mainRef} tabIndex={-1}>
-        {page === 'why' ? <WhyItMattersPage onNavigate={navigate} /> : page === 'help' ? <GetHelpPage /> : (
-          <>
-        <section className="hero" aria-labelledby="page-title" data-scroll-reveal>
-  <h1 id="page-title">Our Mission:</h1>
-
-  <p className="lead">
-    Helping survivors regain control of their digital lives with privacy, support, and the freedom to choose what happens next.
-  </p>
-</section>
-        <div className="working-layout" data-scroll-reveal>
-          <section className="panel controls-panel" aria-labelledby="search-heading">
-            <div className="panel-head">
-              <div>
-                <p className="section-kicker">Discover</p>
-                <h2 id="search-heading">Start with an image</h2>
-                <p>Choose one of our sample images, or add a harmless test image of your own.</p>
-              </div>
-            </div>
-
-            <SearchSource
-              health={health} disabled={loading}
-              source={source} onSourceChange={value => { setSource(value); setResults(null); setAnalysis(null); }}
-              category={category} onCategoryChange={value => { setCategory(value); setResults(null); setAnalysis(null); }}
-            />
-
-            <div className="demo-row">
-              {(demos.length ? demos : FALLBACK_DEMOS).map(demo => (
-                <button className="demo-option" key={demo.id} aria-label={demo.label} onClick={() => runDemo(demo)} disabled={cannotSearch}>
-                  <img src={demo.demo_url} alt="" />
-                  <span>{demo.label.split(' ')[0]}</span>
-                </button>
-              ))}
-            </div>
-            <input hidden ref={picker} type="file" accept="image/png,image/jpeg,image/webp" onChange={onChoose} />
-            <button className="upload" onClick={() => picker.current?.click()} disabled={cannotSearch}>
-              <span className="upload-icon" aria-hidden="true">+</span>
-              <span><strong>Choose a test image</strong><small>PNG, JPG, or WebP • up to 8 MB</small></span>
-            </button>
-
-            <details className="method-details">
-              <summary><span>Matching options</span><small>{methodSummary}</small></summary>
-              <div className="methods" role="group" aria-label="Matching methods" aria-describedby="matching-method-instruction">
-                <span id="matching-method-instruction" hidden>At least one matching method must remain selected.</span>
-                <label className="method">
-                  <input type="checkbox" checked={methods.includes('sha256')} onChange={() => toggleMethod('sha256')} />
-                  <span><strong>Exact files</strong><small>Look for identical files (SHA-256).</small></span>
-                </label>
-                <label className="method">
-                  <input type="checkbox" checked={methods.includes('phash')} onChange={() => toggleMethod('phash')} />
-                  <span><strong>Similar images</strong><small>Find some resized or compressed copies (pHash).</small></span>
-                </label>
-              </div>
-              <span role="status" style={{ position: 'absolute', width: 1, height: 1, padding: 0, margin: -1, overflow: 'hidden', clipPath: 'inset(50%)', whiteSpace: 'nowrap', border: 0 }}>{methodNotice}</span>
-              {(methods.includes('phash') || useUnsplash) && (
-                <div className="phash-settings">
-                  <label htmlFor="phash-scope">How broad should the comparison be?</label>
-                  <select id="phash-scope" value={phashScope} onChange={event => { setPhashScope(event.target.value); setResults(null); }}>
-                    <option value="close">Closer matches</option>
-                    <option value="exploratory">Include less certain candidates</option>
-                  </select>
-                  <small>Broader comparisons may also show unrelated pictures. Every result needs review.</small>
-                </div>
-              )}
-            </details>
-
-            <p className="demo-note">This demonstration compares only approved sample images, not the live internet. Please don't upload intimate or sensitive material.</p>
-            {error && <div className="error" role="alert">{error}</div>}
-          </section>
-
-          <section className="panel results-panel" aria-labelledby="results-heading">
-            <div className="panel-head">
-              <div>
-                <p className="section-kicker purple">Review</p>
-                <h2 id="results-heading">Possible matches</h2>
-                <p>Take a look. You decide what to save.</p>
-              </div>
-            </div>
-            {loading ? (
-              <div className="empty" role="status"><div className="loading-ring" /><h3>Comparing images…</h3></div>
-            ) : !results ? (
-              <div className="empty"><div className="empty-glyph" aria-hidden="true">◎</div><h3>Your results will appear here</h3><p>Choose an image to start.</p></div>
-            ) : (
-              <>
-                <div className="summary" role="status">
-                  <div><h3>{results.results.length} possible match{results.results.length === 1 ? '' : 'es'}</h3><p>{queryLabel} • {fromUnsplash ? `Compared with ${results.checked_references} Unsplash test photo${results.checked_references === 1 ? '' : 's'} (${results.category})` : 'Local demo results only'}</p></div>
-                </div>
-                <ImageDetails analysis={analysis} />
-                {results.results.length ? (
-                  <div className="result-list">
-                    {results.results.map((item, index) => (
-                      <article className="result" key={item.id}>
-                        <div className="result-thumb"><img src={item.thumbnail_url || item.demo_url} alt="" /></div>
-                        <div className="result-body">
-                          <span className={`verdict ${item.exact ? 'exact' : item.phash_tier === 'exploratory' ? 'low' : 'possible'}`}>
-                            {item.exact ? 'Exact file' : item.phash_tier === 'close' ? 'Close visual match' : 'Possible visual match'}
-                          </span>
-                          <h3>{item.label}</h3>
-                          <details className="match-details"><summary>Match details</summary>
-                            <p>Methods: {item.matching_methods.join(', ')}</p>
-                            {item.phash_distance != null && <p>pHash distance: {item.phash_distance} of 64</p>}
-                            {item.openclip_cosine != null && <p>Embedding similarity: {item.openclip_cosine}</p>}
-                            <p>Reference type: {item.kind}</p>
-                            {item.source === 'unsplash' && /^https:\/\/unsplash\.com\//.test(item.source_url || '') && (
-                              <p>Found at: <a href={item.source_url} target="_blank" rel="noopener noreferrer">Unsplash photo page <span aria-hidden="true">↗</span></a></p>
-                            )}
-                          </details>
-                          <button className="save-result-button" aria-label={`Save to vault: result ${index + 1}`} onClick={() => {
-                            setSelectedResult(item);
-                            window.requestAnimationFrame(() => {
-                              document.getElementById('evidence-workspace')?.scrollIntoView({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth' });
-                              savedEvidenceHeadingRef.current?.focus({ preventScroll: true });
-                            });
-                          }}>Save to vault <span aria-hidden="true">↓</span></button>
-                        </div>
-                      </article>
-                    ))}
-                  </div>
-                ) : (
-                  fromUnsplash
-                    ? <div className="empty small"><h3>No matches among these Unsplash photos</h3><p>A match only appears when your image is one of the top photos for that category.</p></div>
-                    : <div className="empty small"><h3>No matches in this demo collection</h3><p>That doesn't mean the image isn't somewhere else.</p></div>
-                )}
-                <p className="results-bottom">{fromUnsplash
-                  ? 'These are possible matches in a small Unsplash test collection, not confirmed findings on the internet.'
-                  : 'These are possible matches in a sample library, not confirmed findings on the internet.'}</p>
-              </>
-            )}
-          </section>
+  return <div className="site">
+    <header className="nav">
+      <div className="brand"><span className="brand-mark">R</span><span>RECLAIM</span><span className="brand-slash">/</span><span className="brand-sub">Discovery Lab</span></div>
+      <div className="nav-meta"><span className="status-dot" /> LOCAL PYTHON API <span className="nav-separator">•</span> DEMO ONLY</div>
+    </header>
+    <main>
+      <section className="hero">
+        <div>
+          <p className="eyebrow">REACT + PYTHON / BASELINE 0.2</p>
+          <h1>One image. <em>Three possible matching methods.</em></h1>
+          <p className="lead">A local prototype of Reclaim's discovery engine. Python preprocesses an uploaded image in memory, extracts selected features, and compares them with an approved SQLite reference catalog.</p>
+          <div className="hero-tags"><span className="pill">Local Python backend</span><span className="pill">SHA-256 + pHash</span><span className="pill">Optional OpenCLIP</span></div>
         </div>
-
-        <SelfSearch onAddByHand={() => { setSelectedResult(null); setAddByHandRequest(count => count + 1); }} />
-
-        <EvidenceWorkspace selectedResult={selectedResult} queryLabel={queryLabel} clearSelection={() => setSelectedResult(null)} savedEvidenceHeadingRef={savedEvidenceHeadingRef} addByHandRequest={addByHandRequest} />
-          </>
-        )}
-      </main>
-      <div className="back-to-top-placement" hidden={!showBackToTop && !backToTopFocused}>
-        <button type="button" className="back-to-top" onClick={backToTop} onFocus={() => setBackToTopFocused(true)} onBlur={() => setBackToTopFocused(false)}>
-          Back to top <span aria-hidden="true">↑</span>
-        </button>
+        <div className="hero-side">
+          <div className="hero-metric"><span>{String(health?.reference_count ?? 0).padStart(2, '0')}</span><small>approved demo references</small></div>
+          <div className="hero-metric"><span>{String(available.length).padStart(2, '0')}</span><small>available methods</small></div>
+          <div className="hero-metric"><span>{results === null ? '—' : String(results.results.length).padStart(2, '0')}</span><small>candidate matches</small></div>
+        </div>
+      </section>
+      <div className="working-layout">
+        <section className="panel controls-panel">
+          <div className="panel-head"><span className="step">01</span><div><h2>Search a sample image</h2><p>Try the built-in demonstration photos or choose a harmless test picture.</p></div></div>
+          <div className="demo-row">
+            {(demos.length ? demos : FALLBACK_DEMOS).map(demo => <button className="demo-option" key={demo.id} onClick={() => runDemo(demo)} disabled={loading || !health || !catalog.length}>
+              <img src={demo.demo_url} alt="Harmless sample illustration" />
+              <span>{demo.label.split(' ')[0]}</span><small>Run demo query</small>
+            </button>)}
+          </div>
+          <input hidden ref={picker} type="file" accept="image/png,image/jpeg,image/webp" onChange={onChoose}/>
+          <button className="upload" onClick={() => picker.current?.click()} disabled={loading || !health || !catalog.length}>
+            <span className="upload-icon">+</span>
+            <span><strong>Choose a test image</strong><small>8 MB max. Sent only to your local Python server for processing.</small></span>
+          </button>
+          <div className="subhead"><h3>Feature extraction</h3><span>Select at least one</span></div>
+          <div className="methods">
+            <label className="method"><input type="checkbox" checked={methods.includes('sha256')} onChange={() => toggleMethod('sha256')}/><span><strong>Cryptographic hash · SHA-256</strong><small>Exact-file matching (even small edits change the hash)</small></span></label>
+            <label className="method"><input type="checkbox" checked={methods.includes('phash')} onChange={() => toggleMethod('phash')}/><span><strong>Perceptual hash · pHash</strong><small>Finds some visually similar resized or compressed images</small></span></label>
+            <label className="method"><input type="checkbox" checked={methods.includes('openclip')} disabled={!available.includes('openclip')} onChange={() => toggleMethod('openclip')}/><span><strong>Computer-vision embeddings · OpenCLIP</strong><small>{available.includes('openclip') ? 'Local model loaded from a developer-provided checkpoint' : 'Optional advanced setup (not required for the baseline)'}</small></span></label>
+          </div>
+          <div className="index-box"><span className="index-led" /><div><strong>{health ? `${catalog.length} safe reference images indexed in SQLite` : 'Waiting for backend connection'}</strong><small>The database stores pre-approved fingerprints, not query uploads. SQL is storage, not a search source.</small></div></div>
+          {error && <div className="error" role="alert">{error}</div>}
+          <p className="fineprint">This demo is not access-controlled or security-audited. Do not use real intimate imagery or case evidence. Local Python processing is NOT the same as browser-only processing.</p>
+        </section>
+        <section className="panel results-panel">
+          <div className="panel-head"><span className="step">02</span><div><h2>Combined results</h2><p>All selected methods compare against the same authorized local reference catalog.</p></div></div>
+          {loading ? <div className="empty"><div className="loading-ring"/><h3>Searching local references…</h3><p>The source image is processed temporarily by Python.</p></div>
+          : !results ? <div className="empty"><div className="empty-glyph">◎</div><h3>No search yet</h3><p>Run a demo query to see exact-file and perceptual comparisons side by side.</p></div>
+          : <>
+            <div className="summary"><div><span className="summary-overline">LOCAL SEARCH FINISHED</span><h3>{results.results.length} candidate match{results.results.length === 1 ? '' : 'es'}</h3><p>{queryLabel}. Compared against {results.checked_references} demo records.</p></div></div>
+            {results.results.length ? <div className="result-list">
+              {results.results.map(item => <article className="result" key={item.id}>
+                <div className="result-thumb"><img src={item.demo_url} alt="Non-sensitive reference sample" /></div>
+                <div>
+                  <div className="result-top"><span className={`verdict ${item.exact ? 'exact' : 'possible'}`}>{item.exact ? 'Same exact file' : 'Possible visual match'}</span><span className="result-kind">{item.kind}</span></div>
+                  <h4>{item.label}</h4>
+                  <div className="distance-row">
+                    {item.matching_methods.map(method => <span key={method}>{method.toUpperCase()} matched</span>)}
+                    {item.phash_distance !== null && <span>pHash distance: {item.phash_distance} / 64</span>}
+                    {item.openclip_cosine !== null && <span>Embedding cosine: {item.openclip_cosine}</span>}
+                  </div>
+                  <label className="review-choice"><input type="checkbox" checked={Boolean(review[item.id])} onChange={event => setReview(previous => ({ ...previous, [item.id]: event.target.checked }))} /> Mark for review (session only)</label>
+                </div>
+              </article>)}
+            </div> : <div className="empty small"><h3>No matching candidates in the demo collection</h3><p>That cannot establish whether the image exists anywhere else.</p></div>}
+            <p className="results-bottom">{results.disclaimer} Search images are not saved by the app. Review checkboxes exist only in React memory and disappear on refresh.</p>
+          </>}
+        </section>
       </div>
-      <footer><span>Reclaim / GDI Hackathon 2026</span><span>Demonstration using safe sample images</span></footer>
-    </div>
-  );
+      <section className="roadmap"><div><p className="eyebrow">NEXT / NOT BUILT YET</p><h2>Search first. Secure evidence and reporting later.</h2><p>OSINT research, metadata inspection, encrypted evidence vaults, and takedown routing are separate, future modules. No internet-wide image search is included in this baseline.</p></div><div className="roadmap-cards"><span>01 <b>Local matching</b><small>Working: SHA-256 + pHash</small></span><span>02 <b>Computer vision</b><small>Optional OpenCLIP with local checkpoint</small></span><span>03 <b>OSINT + evidence vault</b><small>Future, access-controlled integrations</small></span></div></section>
+    </main>
+    <footer>RECLAIM / DISCOVERY LAB <span>Safe sample imagery only • Prototype, not a survivor service</span></footer>
+  </div>;
 }
 
 export default App;
