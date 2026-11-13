@@ -1,0 +1,146 @@
+/* RECLAIM light theme
+ * Applies only when <html data-theme="light">. Dark mode (styles.css) is untouched.
+ * Palette: Charcoal #17262B, Forest Green #1F6F73, Smoky Amethyst #5B4A9E, Muted Violet #8A78B8,
+ * Steel Slate #4A6266, Warm Ivory #F6F2EA, Lavender Mist #DCEBE7, Deep Steel #17383D.
+ */
+
+/* Toggle button (both themes) */
+.theme-toggle {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 38px; height: 38px; padding: 0; flex: none;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  transition: border-color .15s ease, background-color .15s ease;
+}
+.theme-toggle:hover { border-color: var(--forest-light); }
+
+html[data-theme="light"] {
+  color-scheme: light;
+  --ink: #17262B;
+  --forest: #1F6F73;
+  --steel: #4A6266;
+  --amethyst: #5B4A9E;
+  --violet: #8A78B8;
+  --deep-steel: #17383D;
+  --violet-light: #5B4A9E;
+  --title-purple: #5B4A9E;
+  --forest-light: #1F6F73;
+  --steel-light: #1F6F73;
+  --bg: #F6F2EA;
+  --surface: #DCEBE7;
+  --surface-soft: #DCEBE7;
+  --surface-green: #DCEBE7;
+  --surface-purple: #DCEBE7;
+  --border: #17383D;
+  --border-quiet: #4A6266;
+  --text: #17262B;
+  --muted: #4A6266;
+  --subtle: #4A6266;
+  --focus-ring: #5B4A9E;
+}
+
+html[data-theme="light"] .theme-toggle { background: #F6F2EA; border-color: #17383D; color: #17383D; }
+html[data-theme="light"] .theme-toggle:hover { border-color: #1F6F73; color: #1F6F73; }
+
+/* Page background and nav */
+html[data-theme="light"] .site {
+  background-image:
+    radial-gradient(ellipse 37% 30% at 3% 19%, rgba(138, 120, 184, .10), transparent 75%),
+    radial-gradient(ellipse 33% 39% at 101% 48%, rgba(31, 111, 115, .08), transparent 76%);
+}
+html[data-theme="light"] .nav { background: rgba(246, 242, 234, .97); box-shadow: 0 4px 18px rgba(23, 56, 61, .10); }
+html[data-theme="light"] .nav-wordmark { text-shadow: none; }
+html[data-theme="light"] .brand-logo { filter: none; }
+html[data-theme="light"] a:hover { color: #17383D; }
+
+/* Spots where the dark theme uses fixed colors */
+html[data-theme="light"] .primary-button { color: #F6F2EA; background: #1F6F73; border-color: #17383D; }
+html[data-theme="light"] .primary-button:not(:disabled):hover { color: #F6F2EA; background: #17383D; border-color: #17383D; }
+html[data-theme="light"] .save-result-button { border-color: #17383D; color: #F6F2EA; }
+html[data-theme="light"] .fiction-warning,
+html[data-theme="light"] .save-panel .fiction-warning,
+html[data-theme="light"] .report-content .fiction-warning { background: #DCEBE7; border-color: #8A78B8; color: #17262B; }
+html[data-theme="light"] .vault-record,
+html[data-theme="light"] .self-search-item,
+html[data-theme="light"] .prevention-tools li { background: #DCEBE7; border-color: #4A6266; }
+html[data-theme="light"] .fact-card,
+html[data-theme="light"] .fact-card:not(.fact-cta):hover { background: #DCEBE7; border-color: #4A6266; box-shadow: 0 8px 28px rgba(23, 56, 61, .08); }
+html[data-theme="light"] .support-note { background: #DCEBE7; border-color: #8A78B8; }
+html[data-theme="light"] .resource-card:hover { background-color: #DCEBE7; }
+html[data-theme="light"] .help-quick-link:hover,
+html[data-theme="light"] .help-quick-link:focus-visible { background: #5B4A9E; color: #F6F2EA; border-color: #5B4A9E; }
+html[data-theme="light"] ::selection { background: #5B4A9E; color: #F6F2EA; }
+html[data-theme="light"] select,
+html[data-theme="light"] input[type=password],
+html[data-theme="light"] input[type=text],
+html[data-theme="light"] input[type=date],
+html[data-theme="light"] textarea { background: #F6F2EA; border-color: #4A6266; color: #17262B; }
+html[data-theme="light"] .fact-type { color: #5B4A9E; }
+html[data-theme="light"] .fact-figure { color: #17262B; }
+html[data-theme="light"] .fact-description sup a { color: #17262B; }
+html[data-theme="light"] .fact-cta { background: #DCEBE7; }
+html[data-theme="light"] .fact-cta .mini-cta { box-shadow: none; }
+html[data-theme="light"] .help-quick-link { background: #DCEBE7; color: #17262B; border-color: #4A6266; }
+html[data-theme="light"] .help-quick-number { color: #5B4A9E; }
+html[data-theme="light"] .help-quick-arrow { color: #4A6266; }
+html[data-theme="light"] .help-quick-link:hover .help-quick-number,
+html[data-theme="light"] .help-quick-link:hover .help-quick-arrow,
+html[data-theme="light"] .help-quick-link:focus-visible .help-quick-number,
+html[data-theme="light"] .help-quick-link:focus-visible .help-quick-arrow { color: #F6F2EA; }
+html[data-theme="light"] .help-section-number { background: #5B4A9E; color: #F6F2EA; }
+
+/* Cards, panels and notes that use fixed dark backgrounds */
+html[data-theme="light"] .resource-card,
+html[data-theme="light"] .demo-option,
+html[data-theme="light"] .phash-settings,
+html[data-theme="light"] .save-panel,
+html[data-theme="light"] .vault-warning,
+html[data-theme="light"] .vault-empty,
+html[data-theme="light"] .report-placeholder,
+html[data-theme="light"] .export-box,
+html[data-theme="light"] .mission-note,
+html[data-theme="light"] .vault-notice { background: #DCEBE7; border-color: #4A6266; color: #17262B; }
+html[data-theme="light"] .resource-card:hover,
+html[data-theme="light"] .demo-option:not(:disabled):hover { background-color: #F6F2EA; }
+html[data-theme="light"] .demo-option img,
+html[data-theme="light"] .result-thumb,
+html[data-theme="light"] .vault-preview img { background: #F6F2EA; }
+html[data-theme="light"] .empty-glyph { border-color: #8A78B8; }
+html[data-theme="light"] .error { background: #F6F2EA; color: #17262B; border-left-color: #5B4A9E; }
+
+/* Buttons */
+html[data-theme="light"] .upload:not(:disabled):hover { background: #DCEBE7; }
+html[data-theme="light"] .upload-icon { background: #1F6F73; color: #F6F2EA; }
+html[data-theme="light"] .outlined-button { color: #17383D; background: #F6F2EA; border-color: #17383D; }
+html[data-theme="light"] .outlined-button:not(:disabled):hover { color: #F6F2EA; background: #17383D; border-color: #17383D; }
+html[data-theme="light"] .quiet-button:hover,
+html[data-theme="light"] .mini-cta:hover { background: #DCEBE7; color: #17262B; }
+html[data-theme="light"] .save-result-button:hover { background: #17383D; }
+
+/* Small labels and tags */
+html[data-theme="light"] .verdict,
+html[data-theme="light"] .verdict.low { background: #8A78B8; color: #F6F2EA; }
+html[data-theme="light"] .verdict.exact { background: #1F6F73; color: #F6F2EA; }
+html[data-theme="light"] .demo-stamp,
+html[data-theme="light"] .manual-stamp { background: #17383D; color: #F6F2EA; }
+html[data-theme="light"] .reference-stamp { background: #1F6F73; color: #F6F2EA; }
+html[data-theme="light"] .resource-tag { color: #5B4A9E; }
+html[data-theme="light"] .resource-link { color: #1F6F73; border-color: #1F6F73; }
+html[data-theme="light"] .resource-link:hover { color: #17383D; }
+
+html[data-theme="light"] .quiet-button { color: #17383D; border-color: #4A6266; }
+
+/* "Clear the vault from this browser" button: Deep Steel in light mode */
+html[data-theme="light"] .quiet-button.remove { background: #17383D; border-color: #17383D; color: #F6F2EA; }
+html[data-theme="light"] .quiet-button.remove:not(:disabled):hover { background: #17262B; border-color: #17262B; color: #F6F2EA; }
+
+/* "Open the app" button on Why it matters: Ink text in light mode */
+html[data-theme="light"] .mini-cta,
+html[data-theme="light"] .mini-cta:hover { color: #17262B; }
+
+/* Sources on Why it matters: Ink links and numbers in light mode */
+html[data-theme="light"] .source-list,
+html[data-theme="light"] .source-list a,
+html[data-theme="light"] .source-list a:hover { color: #17262B; }
