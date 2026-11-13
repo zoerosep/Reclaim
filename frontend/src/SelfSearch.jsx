@@ -12,11 +12,10 @@ export default function SelfSearch({ onAddByHand }) {
         <div>
           <p className="section-kicker steel">Search wider</p>
           <h2 id="self-search-heading">Search the wider internet yourself</h2>
-          <p>Reclaim's own search only looks at sample images. These search engines look across the internet. Each button opens that site in a new tab.</p>
         </div>
       </div>
       <p className="platform-note self-search-privacy" role="note">
-        <b>Reclaim sends nothing to these sites.</b> If you upload an image on one of them, it goes to that company, not to Reclaim. You decide what to share. An ordinary photo of your face, or a cropped version, can be enough to search with.
+        <b>Reclaim sends nothing to these sites.</b> If you upload an image on one of them, it goes to that company, not to Reclaim. You decide what to share. An ordinary photo of your face, or a cropped version, can be enough to search with. No result on these sites does not mean an image is not online. They do not cover every website.
       </p>
       <ul className="self-search-list">
         {SEARCH_ENGINES.map(engine => (
@@ -34,7 +33,6 @@ export default function SelfSearch({ onAddByHand }) {
         <p><strong>Found something?</strong> Keep the web address and your own notes in your vault. No image is saved.</p>
         <button type="button" className="primary-button" onClick={onAddByHand}>Add what you found to the vault <span aria-hidden="true">↓</span></button>
       </div>
-      <p className="fineprint">No result on these sites does not mean an image is not online. They do not cover every website.</p>
     </section>
   );
 }

@@ -411,7 +411,6 @@ export default function EvidenceWorkspace({ selectedResult, queryLabel, clearSel
         <div className="save-actions"><button type="submit" className="primary-button" disabled={busy}>{activeOperation === 'save-manual' ? 'Saving…' : 'Save record'}</button><span>Add a web address, a note, or both.</span></div>
       </form>}
       {!selectedResult && !manualOpen && <div className="manual-start">
-        <p className="instruct">When you find a possible match, choose <strong>Save to vault</strong> to keep it here. Found something outside Reclaim? Add it yourself, with no image.</p>
         <button type="button" className="outlined-button" ref={addByHandButtonRef} onClick={openManual}>Add a record by hand</button>
       </div>}
       <div className="vault-count"><strong>{records.length} saved record{records.length === 1 ? '' : 's'}</strong><span>On this device • previews hidden</span></div>
