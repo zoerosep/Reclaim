@@ -381,8 +381,6 @@ select:focus-visible, input:focus-visible, textarea:focus-visible { outline-colo
   .loading-ring { animation: none !important; }
   .demo-option, .nav-links a, .upload, .save-result-button, .primary-button, .outlined-button, .quiet-button, .mini-cta, .help-quick-link, .resource-link { transition: none !important; }
 }
-
-
 /* RECLAIM centered navigation wordmark */
 .nav {
   display: grid;
