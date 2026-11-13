@@ -310,7 +310,6 @@ function App() {
   <p className="lead">
     Helping survivors regain control of their digital lives with privacy, support, and the freedom to choose what happens next.
   </p>
-  <p className="what-is">Reclaim is a private place to search for an image, keep your evidence on your own device, and find the right steps to ask for its removal.</p>
   <ol className="steps-strip" aria-label="How Reclaim works, in four steps">
     <li><span className="steps-number" aria-hidden="true">1</span><strong>Search</strong><span>Start with an image</span></li>
     <li><span className="steps-number" aria-hidden="true">2</span><strong>Review</strong><span>Look at possible matches</span></li>
