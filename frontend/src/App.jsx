@@ -2,6 +2,7 @@ import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { flushSync } from 'react-dom';
 import EvidenceWorkspace from './EvidenceWorkspace.jsx';
 import SearchSource from './SearchSource.jsx';
+import SelfSearch from './SelfSearch.jsx';
 import ImageDetails from './ImageDetails.jsx';
 import { WhyItMattersPage, GetHelpPage } from './InfoPages.jsx';
 import reclaimLogo from './assets/reclaim-logo.png';
@@ -170,6 +171,8 @@ function App() {
   const [results, setResults] = useState(null);
   const [queryLabel, setQueryLabel] = useState('');
   const [selectedResult, setSelectedResult] = useState(null);
+  // Counts requests to open the "add a record by hand" form in the vault.
+  const [addByHandRequest, setAddByHandRequest] = useState(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const picker = useRef(null);
@@ -428,7 +431,9 @@ function App() {
           </section>
         </div>
 
-        <EvidenceWorkspace selectedResult={selectedResult} queryLabel={queryLabel} clearSelection={() => setSelectedResult(null)} savedEvidenceHeadingRef={savedEvidenceHeadingRef} />
+        <SelfSearch onAddByHand={() => { setSelectedResult(null); setAddByHandRequest(count => count + 1); }} />
+
+        <EvidenceWorkspace selectedResult={selectedResult} queryLabel={queryLabel} clearSelection={() => setSelectedResult(null)} savedEvidenceHeadingRef={savedEvidenceHeadingRef} addByHandRequest={addByHandRequest} />
           </>
         )}
       </main>

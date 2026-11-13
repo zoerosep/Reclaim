@@ -192,3 +192,11 @@ The command-line image engine in `reclaim-fullstack-baseline/image-engine/` is n
 - **Tests** use a simulated Unsplash, so they need no key and no internet.
 
 **In the page:** under *Start with an image*, **Where should we look?** switches between the sample image library and the Unsplash test photos (with a category). Every search also shows **About the image you searched with**, the image processor's report. An Unsplash match can be saved to the vault like a sample match: the record keeps a small preview, the match details and the address of the Unsplash photo page it was found at. Without an Unsplash key the option is shown but switched off, with the reason.
+
+## Search wider, add records by hand, prevention services (v0.9)
+
+- **Search the wider internet yourself:** buttons that open Google Lens, Yandex Images, TinEye and PimEyes in a new tab. Reclaim sends nothing to them.
+- **Add a record by hand:** save a web address, a date and your own notes in the vault with no image. Included in the encrypted `.reclaim` backup.
+- **Stop copies spreading:** every reporting guide links to StopNCII.org (18 or older in the image) and NCMEC's Take It Down (under 18 in the image).
+
+Details: `docs/EVIDENCE_AND_REPORTING.md`. Frontend unit tests: `node --test frontend/tests/*.test.js`.

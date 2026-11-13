@@ -84,8 +84,28 @@ export const PLATFORMS = {
 export const PLATFORM_IDS = Object.keys(PLATFORMS);
 export const isPlatform = id => Object.prototype.hasOwnProperty.call(PLATFORMS, id);
 
-/** Which platform guide a saved record belongs to. Older records (Reddit only) have no field. */
+/**
+ * Shown for a hand-added record about a site Reclaim has no guide for.
+ * Google's page explains how to ask for a result to be removed from Google Search
+ * (checked November 12, 2026). That does not remove it from the website itself.
+ */
+export const GENERAL_GUIDE = {
+  name: 'the website',
+  heading: 'Another website or app',
+  intro: "Reclaim does not have a guide for this site yet. Look for a Report or Contact link on the page itself, or in the site's help pages, and give them the web address you saved. Whatever the site does, you can also ask Google to stop showing the page in its search results. That takes it out of Google Search, not off the website.",
+  draftNote: '',
+  links: [
+    { label: 'How to ask Google to remove it from search results', href: 'https://support.google.com/websearch/answer/6302812' },
+  ],
+};
+
+/**
+ * Which platform guide a saved record belongs to.
+ * - Hand-added records: the platform the person chose, or null for "another website".
+ * - Fictional demo records: their platform. Older ones (Reddit only) have no field.
+ */
 export function platformForRecord(record) {
+  if (record?.recordType === 'manual') return isPlatform(record.reportPlatform) ? record.reportPlatform : null;
   if (!record?.sourceIsFictional) return null;
   const id = record.reportPlatform || record.sourceKind;
   return isPlatform(id) ? id : 'reddit';

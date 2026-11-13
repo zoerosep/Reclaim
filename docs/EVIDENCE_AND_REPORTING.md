@@ -79,6 +79,45 @@ The guides and links live in one file, `frontend/src/lib/reportingPlatforms.js`.
 - Case-specific reporting routes, notices, acknowledgements, reminders, and source-site API integrations
 - Procedures for material created when a person was under 18: do not capture, reproduce, or distribute those images through a generic vault; route to specialized reporting organizations
 
+## Searching wider, hand-added records and prevention services (v0.9)
+
+Three additions that make Reclaim useful even when its own search did not find anything. None of them makes a network request: Reclaim only opens other sites in a new tab.
+
+### Search the wider internet yourself
+
+`frontend/src/SelfSearch.jsx` shows buttons for Google Lens, Yandex Images, TinEye and PimEyes (listed in `frontend/src/lib/supportTools.js`). Each button is an ordinary link that opens the search engine's home page with `rel="noopener noreferrer"`. **Reclaim sends no image, web address or other data to these sites.** If a person uploads an image there, it goes to that company under that company's terms. The panel says so, and suggests an ordinary face photo or a cropped image is often enough.
+
+### Records added by hand
+
+**Add a record by hand** (in the vault, and from the search panel) saves a text-only record:
+
+- where it was found (Reddit, X, Snapchat, OnlyFans, or another website or app)
+- the web address, checked to be an ordinary `http`/`https` address
+- the date the person saw it (optional)
+- the person's own notes
+
+At least a web address or a note is required. **No image is ever stored for these records.** The saved address is shown as text with a Copy button, not as a clickable link, so nobody is sent back to the content by accident. Logic lives in `frontend/src/lib/manualRecords.js`.
+
+Where it is kept: in this browser's IndexedDB on this device, like the rest of the vault. **It is not encrypted there**, so anyone who can open the browser profile could read it. The downloaded `.reclaim` backup *is* encrypted with the passphrase, and hand-added records are included in it. On restore, each hand-added record is rebuilt from the known fields only.
+
+A hand-added record opens the real reporting guide for its platform, without the "fictional" warnings, and offers **Copy my record summary**. For "another website or app" the guide points to Google's page on removing explicit personal images from Search results (that removes a result from Google Search, not from the website).
+
+### StopNCII.org and Take It Down
+
+Every reporting guide, and the empty reporting panel, now ends with **Stop copies spreading**:
+
+| Service | Who it is for | Link |
+|---|---|---|
+| StopNCII.org | The person was 18 or older in the image | https://stopncii.org/ |
+| Take It Down (NCMEC) | The person was under 18 in the image (adults can use it for images from when they were under 18) | https://takeitdown.ncmec.org/ |
+
+Both create a fingerprint (hash) on the person's own device; the image is not uploaded, and only participating platforms act on it. Take It Down, the NCMEC service, is not the same thing as the U.S. Take It Down Act. Details were checked against each organisation's own pages on November 12, 2026.
+
+### To check before any real-world release
+
+- Open each search engine and service link once on a real computer.
+- Decide whether hand-added records need encryption at rest before real use.
+
 ## GitHub reminder
 
 Only commit the example code and intentionally included sample photos. Do **not** commit `.reclaim` exports, real evidence, secrets, or local databases. `.gitignore` now includes `*.reclaim`.

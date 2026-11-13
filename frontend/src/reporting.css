@@ -2,3 +2,46 @@
 .platform-note { margin: 12px 0 0; padding: 10px 12px; border-left: 3px solid var(--steel-light); border-radius: 5px; background: var(--surface-soft); color: var(--muted); font-size: var(--size-meta); line-height: 1.6; }
 .platform-note a { color: var(--steel-light); }
 .platform-note-warning { border-left-color: #E3C48E; color: #F2D9B5; }
+
+/* "Search the wider internet yourself" panel. */
+.self-search-panel { margin-top: 23px; }
+.self-search-privacy { margin: 0 0 18px; }
+.self-search-privacy b { color: var(--text); }
+.self-search-list { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+.self-search-item { display: flex; flex-direction: column; gap: 8px; padding: 15px; background: #2D3239; border: 1px solid #525A64; border-radius: 10px; }
+.self-search-item h3 { font: 400 1.15rem/1.3 var(--font-editorial); color: var(--text); margin: 0; }
+.self-search-item p { flex: 1; margin: 0; color: var(--muted); font-size: var(--size-meta); line-height: 1.6; }
+.self-search-next { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 14px; margin-top: 18px; padding: 15px; border: 1px solid #52705E; border-radius: 10px; background: var(--surface-green); }
+.self-search-next p { margin: 0; color: var(--muted); font-size: var(--size-interface); line-height: 1.6; flex: 1 1 280px; }
+.self-search-next strong { color: var(--text); }
+
+/* "Add a record by hand" form and the records it creates. */
+.manual-start { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; margin: 14px 0; }
+.manual-start .instruct { margin: 0; flex: 1 1 320px; line-height: 1.6; }
+.manual-panel input[type=text], .manual-panel input[type=date], .manual-panel select, .manual-panel textarea { display: block; width: 100%; }
+.manual-panel input[type=date] { border: 1px solid #67717C; border-radius: 7px; padding: 10px 12px; background: #191E25; color: var(--text); min-height: 43px; font-size: var(--size-interface); max-width: 260px; color-scheme: dark; }
+.save-panel p.manual-privacy { margin: 14px 0 0; color: var(--subtle); font-size: var(--size-meta); line-height: 1.6; }
+.manual-panel .error { margin-top: 14px; }
+.manual-stamp { display: inline-block; font-size: .75rem; border-radius: 4px; padding: 4px 7px; letter-spacing: .035em; color: #DEE9F1; background: #36495C; font-family: var(--font-editorial); }
+.manual-notes { white-space: pre-wrap; }
+.manual-address code { overflow-wrap: anywhere; }
+.quiet-button.compact { min-height: 32px; padding: 4px 10px; font-size: var(--size-meta); margin-left: 6px; vertical-align: middle; }
+
+/* StopNCII / Take It Down block under every reporting guide. */
+.prevention-tools { margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--border); }
+.prevention-tools h3 { font: 400 1.3rem/1.3 var(--font-editorial); color: var(--text); margin: 0 0 8px; }
+.prevention-tools > p { color: var(--muted); font-size: var(--size-interface); line-height: 1.7; margin: 0 0 14px; }
+.prevention-tools ul { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.prevention-tools li { display: flex; flex-direction: column; align-items: flex-start; gap: 7px; padding: 15px; background: #2D3239; border: 1px solid #525A64; border-radius: 10px; }
+.prevention-who { color: var(--forest-light); font-size: var(--size-meta); font-weight: 700; }
+.prevention-tools strong { color: var(--text); font: 400 1.15rem/1.3 var(--font-editorial); }
+.prevention-text { flex: 1; color: var(--muted); font-size: var(--size-meta); line-height: 1.6; }
+
+@media (max-width: 900px) {
+  .self-search-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 560px) {
+  .self-search-list, .prevention-tools ul { grid-template-columns: 1fr; }
+  .self-search-item a, .prevention-tools a, .self-search-next button, .manual-start button { width: 100%; }
+}
+.report-content > .quiet-button { margin-top: 12px; }
