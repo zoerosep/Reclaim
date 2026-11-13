@@ -60,6 +60,16 @@
 
 Reddit describes separate routes: in-app/site reporting of posts or comments for **Non-Consensual Intimate Media**, or a U.S. legal notice under the TAKE IT DOWN Act. For the legal notice Reddit requires the **real direct link, contact email and full legal signature**. Choose the eligible route based on actual circumstances. Do not submit fake demonstration data to the real form.
 
+## More platforms (X, Snapchat, OnlyFans)
+
+The fictional-finding flow now covers four platforms: Reddit, X, Snapchat and OnlyFans. Pick one under **Where was this found? (demo)** when saving a match, then open that record's **Reporting guide**. Each guide is the same kind of thing as the Reddit one: plain-language steps plus links to the platform's own reporting pages, opened in a new tab. Reclaim does not submit anything for the person.
+
+The guides and links live in one file, `frontend/src/lib/reportingPlatforms.js`. To add or correct a platform, edit that file. Links were copied from each platform's official help pages on November 12, 2026; platforms change these pages, so re-check them before any real-world release.
+
+- **X:** Take It Down Act report form, how X handles those reports, and X's policy page.
+- **Snapchat:** the web form for intimate imagery shared without consent, and Snapchat's reporting help article. Snapchat also recommends reporting inside the app.
+- **OnlyFans: link not verified.** OnlyFans' own help pages could not be read while building this, so the guide does not link to a report form. It points to Australia's eSafety Commissioner guide, which lists OnlyFans' "Report a user or post" option. A teammate should find OnlyFans' official removal or report page, confirm it, and add it to `reportingPlatforms.js` (the file has a commented example).
+
 ## Engineering boundaries / future work
 
 - Independent review of enrollment, authorized access, prevention of misuse, and logging
