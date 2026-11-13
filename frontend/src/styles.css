@@ -22,6 +22,8 @@
   --violet: #746487;
   --deep-steel: #2F4155;
   --violet-light: #C2A8D3;
+  /* Page titles on "Why it matters" and "Get help". Change this one value for a light theme. */
+  --title-purple: var(--violet-light);
   --forest-light: #9FC7A8;
   --steel-light: #B3C5D5;
   --bg: #1C1F24;
@@ -48,7 +50,7 @@ html { scroll-behavior: smooth; scroll-padding-top: var(--sticky-header-clearanc
 body { margin: 0; min-width: 320px; background: var(--bg); color: var(--text); font-size: var(--size-body); line-height: 1.55; }
 button, input, textarea, select { font: inherit; }
 h1, h2, h3, h4, h5, h6 { font-family: var(--font-heading); }
-.section-kicker, .info-eyebrow, .fact-type, .resource-tag { font-family: var(--font-editorial); }
+.section-kicker, .fact-type, .resource-tag { font-family: var(--font-editorial); }
 .demo-option > span, .result-body > .verdict, .vault-record-top .demo-stamp, .vault-record-top .reference-stamp, .vault-count > strong, .panel-head > .step, .help-section-number { font-family: var(--font-editorial); }
 button, summary { cursor: pointer; }
 button:disabled { opacity: .56; cursor: not-allowed; }
@@ -292,8 +294,7 @@ select:focus-visible, input:focus-visible, textarea:focus-visible { outline-colo
 /* Standalone Why it matters + Get help pages. The app panels above are unchanged. */
 .info-page { padding-bottom: 28px; }
 .info-hero { max-width: 890px; text-align: center; padding: 65px 0 47px; margin-inline: auto; }
-.info-eyebrow { margin: 0 0 11px; letter-spacing: .18em; text-transform: uppercase; font-size: .79rem; font-weight: 700; color: #BBA5C7; }
-.info-hero h1 { color: var(--text); font: 600 clamp(2.45rem, 4.6vw, 4rem)/1.1 var(--font-heading); letter-spacing: -.025em; margin: 0; }
+.info-hero h1 { color: var(--title-purple); font: 600 clamp(2.45rem, 4.6vw, 4rem)/1.1 var(--font-heading); letter-spacing: -.025em; margin: 0; }
 .info-intro { color: var(--muted); max-width: 690px; margin: 18px auto 0; font-size: 1.07rem; line-height: 1.75; }
 .facts-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 18px; }
 .fact-card { padding: 28px; border-radius: 13px; border: 1px solid #53505C; background: rgba(40,43,51,.95); min-height: 215px; box-shadow: 0 8px 28px #0b101516; transition: background-color .2s ease; }
