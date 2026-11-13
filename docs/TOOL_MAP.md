@@ -11,7 +11,7 @@ This is a **design map**, not a list of services the application secretly invoke
 | pHash (NumPy + SciPy DCT) | Open-source algorithm/components | Identify near-duplicate visual content | **Yes, active** |
 | OpenCLIP (`open_clip_torch`) | Open-source image encoder; weights have separate licensing | Generate local image embeddings from compatible pretrained weights | **Optional adapter**, off unless installed and locally configured |
 | SQLite (`sqlite3`) | Local database | Save authorized comparison *fingerprints* and make a local reference index | **Yes, active** |
-| ExifTool | Metadata inspector | Examine EXIF/XMP/IPTC of authorized files; GPS and device metadata are highly sensitive | **Research/offline only** |
+| ExifTool | Metadata inspector | Examine EXIF/XMP/IPTC of authorized files; GPS and device metadata are highly sensitive | **Optional, `/api/analyze` only**: used when installed, image piped in memory; Pillow reads basic EXIF otherwise |
 | ImageMagick | Image-processing CLI | Batch resize/conversion/normalization, generate safe test variants | **Development only**; not executed on uploads |
 | Maltego | Proprietary licensed OSINT/graph platform with free tier | Analyze relationships between authorized URLs, accounts, domains, and manually collected leads | **Future, manual/approved workflows only** |
 | Autopsy | Open-source forensic examination tool | Examine forensic copies of disks/devices in qualified, authorized investigations | **Separate forensic workflow** |
@@ -48,7 +48,7 @@ This is a **design map**, not a list of services the application secretly invoke
 
 - `ImageOps.exif_transpose()` normalizes orientation and Pillow converts to RGB in memory. It does not preserve GPS fields in the search response.
 - This API accepts raw image request bytes via `Request.stream()` to avoid multipart upload temporary spooling in this application. It does *not* guarantee erasure of memory, operating system buffers, browser caches, or networks.
-- ExifTool is **not** run automatically on query images. Its common CLI workflow reads a file path; writing uploaded images to a temporary file would conflict with our current no-disk requirement.
+- ExifTool is **not** run during a search. `POST /api/analyze` runs it only when it is installed, and pipes the image to it through standard input, so the upload is still never written to a temporary file. That endpoint returns the metadata to the person who uploaded the image; `/api/search` still returns none.
 - ImageMagick is **not** run automatically on query images for the same reason.
 - Different devices, file copies, and platforms may strip or modify metadata. EXIF is not proof of who uploaded an image.
 - Avoid external services and real case material in this prototype. Do not store sensitive metadata, source images, hashes, or real reference vectors in GitHub.
