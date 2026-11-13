@@ -158,6 +158,14 @@ main { max-width: 1320px; padding: 0 clamp(18px, 4vw, 54px) 72px; margin: 0 auto
 .demo-row { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
 .demo-option { color: var(--text); text-align: left; overflow: hidden; background: #30363C; border: 1px solid #4C555C; border-radius: 9px; padding: 0 0 9px; transition: border-color .15s ease; }
 .demo-option:hover { border-color: var(--forest-light); }
+@media (hover: hover) {
+  .demo-option:not(:disabled) { transition: transform .2s ease, border-color .2s ease; }
+  .demo-option:not(:disabled):hover { transform: translateY(-2px); border-color: #9983AA; }
+}
+@media (hover: hover) and (prefers-reduced-motion: reduce) {
+  .demo-option:not(:disabled) { transition: none !important; }
+  .demo-option:not(:disabled):hover { transform: none; }
+}
 .demo-option img { width: 100%; height: 112px; display: block; object-fit: cover; background: #13191A; }
 .demo-option span { display: block; padding: 10px 12px 0; font-size: var(--size-interface); }
 .upload { display: flex; align-items: center; width: 100%; gap: 13px; padding: 17px 16px; margin-top: 15px; background: var(--surface-green); color: var(--text); border: 1px solid #52705E; border-radius: 9px; text-align: left; }
@@ -331,6 +339,14 @@ select:focus-visible, input:focus-visible, textarea:focus-visible { outline-colo
 .help-section-head p:not(.section-kicker) { font-size: .94rem; color: var(--muted); margin: 0; line-height: 1.6; }
 .resource-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 13px; }
 .resource-card { border: 1px solid #52545D; background: #2C3037; border-radius: 10px; padding: 22px; display: flex; flex-direction: column; align-items: flex-start; }
+@media (hover: hover) {
+  .resource-card { transition: transform .2s ease, border-color .2s ease; }
+  .resource-card:hover { transform: translateY(-2px); border-color: #9983AA; }
+}
+@media (hover: hover) and (prefers-reduced-motion: reduce) {
+  .resource-card { transition: none !important; }
+  .resource-card:hover { transform: none; }
+}
 .resource-tag { display: inline-block; font-size: .73rem; letter-spacing: .045em; color: #CDB8D7; margin-bottom: 10px; }
 .resource-card h3 { font: 400 1.2rem/1.35 var(--font-editorial); margin: 0 0 10px; color: var(--text); }
 .resource-card p { color: var(--muted); line-height: 1.65; margin: 0 0 18px; font-size: .92rem; }
@@ -407,4 +423,30 @@ select:focus-visible, input:focus-visible, textarea:focus-visible { outline-colo
   .loading-ring { animation: none !important; }
   .nav-links a::after { transition: none !important; }
   .demo-option, .nav-links a, .upload, .save-result-button, .primary-button, .outlined-button, .quiet-button, .mini-cta, .help-quick-link, .resource-link { transition: none !important; }
+}
+
+/* Experimental shared card hover feedback. */
+@media (hover: hover) {
+  .controls-panel, .results-panel, .self-search-panel, .vault-panel, .reporting-panel, .export-box {
+    transition: border-color .2s ease;
+  }
+  .controls-panel:hover, .results-panel:hover, .self-search-panel:hover, .vault-panel:hover, .reporting-panel:hover, .export-box:hover {
+    border-color: #9983AA;
+  }
+  .self-search-item, .prevention-tools li, .fact-card, .info-mission, .source-section {
+    transition: translate .2s ease, border-color .2s ease, background-color .2s ease;
+  }
+  .self-search-item:hover, .prevention-tools li:hover, .fact-card:hover, .info-mission:hover, .source-section:hover {
+    translate: 0 -2px;
+    border-color: #9983AA;
+  }
+}
+@media (hover: hover) and (prefers-reduced-motion: reduce) {
+  .controls-panel, .results-panel, .self-search-panel, .vault-panel, .reporting-panel, .export-box,
+  .self-search-item, .prevention-tools li, .fact-card, .info-mission, .source-section {
+    transition: none !important;
+  }
+  .self-search-item:hover, .prevention-tools li:hover, .fact-card:hover, .info-mission:hover, .source-section:hover {
+    translate: none;
+  }
 }
