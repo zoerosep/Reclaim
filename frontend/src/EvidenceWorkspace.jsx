@@ -104,7 +104,7 @@ export default function EvidenceWorkspace({ selectedResult, queryLabel, clearSel
     setRecords(values.sort((a, b) => b.discoveredAt.localeCompare(a.discoveredAt)));
   }
   useEffect(() => { refresh().catch(err => setVaultError(err.message)); }, []);
-  useEffect(() => { setNotes(''); setSourceType('local'); setVaultError(''); }, [selectedResult?.id]);
+  useEffect(() => { setNotes(''); setSourceType(selectedResult?.source === 'unsplash' ? 'unsplash' : 'local'); setVaultError(''); }, [selectedResult?.id]);
 
   function clearFeedback() {
     setVaultError('');
@@ -116,12 +116,24 @@ export default function EvidenceWorkspace({ selectedResult, queryLabel, clearSel
     if (!selectedResult || busy) return;
     clearFeedback(); setBusy(true); setActiveOperation('save');
     try {
-      // Intentionally allow ONLY the bundled, safe demo reference images.
-      if (!/^\/samples\/[a-z0-9.-]+\.(png|jpe?g|webp)$/i.test(selectedResult.demo_url)) {
+      // Intentionally allow ONLY the bundled, safe demo reference images, or a
+      // photo from the Unsplash test collection that the local Python backend
+      // returned in a recent search (it serves previews for those photos only).
+      const fromUnsplash = selectedResult.source === 'unsplash';
+      let imageUrl = selectedResult.demo_url;
+      if (fromUnsplash) {
+        if (!/^[A-Za-z0-9_-]{1,64}$/.test(selectedResult.photo_id || '')) {
+          throw new Error('This Unsplash result cannot be saved.');
+        }
+        imageUrl = `/api/unsplash/thumbnail/${selectedResult.photo_id}`;
+      } else if (!/^\/samples\/[a-z0-9.-]+\.(png|jpe?g|webp)$/i.test(selectedResult.demo_url || '')) {
         throw new Error('Only the bundled safe demonstration references can be saved.');
       }
-      const response = await fetch(selectedResult.demo_url, { cache: 'no-store' });
-      if (!response.ok) throw new Error('The selected demo reference image could not be loaded.');
+      const response = await fetch(imageUrl, { cache: 'no-store' });
+      if (!response.ok) {
+        const details = fromUnsplash ? await response.json().catch(() => null) : null;
+        throw new Error(details?.detail || 'The selected demo reference image could not be loaded.');
+      }
       const imageBlob = await response.blob();
       if (!imageBlob.type.startsWith('image/') || imageBlob.size > 8 * 1024 * 1024) {
         throw new Error('Invalid demo reference image.');
@@ -132,10 +144,11 @@ export default function EvidenceWorkspace({ selectedResult, queryLabel, clearSel
       await saveEvidence({
         id: crypto.randomUUID(), demoOnly: true, sourceIsFictional: sourceType === 'reddit',
         discoveredAt: new Date().toISOString(), sourcePublishedAt: null,
-        sourcePlatform: sourceType === 'reddit' ? 'Reddit (fictional)' : 'Local sample catalog',
-        sourceUrl: sourceType === 'reddit' ? FAKE_REDDIT_URL : null,
+        sourceKind: sourceType, // 'local', 'unsplash' or 'reddit' (fictional)
+        sourcePlatform: sourceType === 'reddit' ? 'Reddit (fictional)' : sourceType === 'unsplash' ? 'Unsplash test collection' : 'Local sample catalog',
+        sourceUrl: sourceType === 'reddit' ? FAKE_REDDIT_URL : sourceType === 'unsplash' ? (selectedResult.source_url || null) : null,
         referenceId: selectedResult.id, referenceLabel: selectedResult.label,
-        referenceFileName: selectedResult.file_name || selectedResult.demo_url.split('/').pop(),
+        referenceFileName: selectedResult.file_name || (selectedResult.demo_url || '').split('/').pop(),
         referenceSha256,
         referenceKind: selectedResult.kind,
         matchingMethods: selectedResult.matching_methods,
@@ -152,6 +165,8 @@ export default function EvidenceWorkspace({ selectedResult, queryLabel, clearSel
       finishSelection();
       setNotice(sourceType === 'reddit'
         ? 'Demo image saved with a FICTIONAL Reddit source. This is NOT a discovery on Reddit.'
+        : sourceType === 'unsplash'
+        ? 'Unsplash test photo and match details saved locally in this browser.'
         : 'Demo reference image and match details saved locally in this browser.');
     } catch (err) { setVaultError(err.message); }
     finally { setBusy(false); setActiveOperation(null); }
@@ -270,10 +285,12 @@ export default function EvidenceWorkspace({ selectedResult, queryLabel, clearSel
       <div className="panel-head"><span className="step">03</span><div><h2 ref={savedEvidenceHeadingRef} tabIndex={-1}>Saved evidence</h2><p>Keep the matches you choose. Previews stay hidden until you open them.</p></div></div>
       <p className="vault-warning"><strong>Demo safety note:</strong> Saved items are not encrypted in this browser. Only use sample images. A possible match is not proof of distribution.</p>
       {selectedResult && <div className="save-panel">
-        <div className="save-head"><div><span className="section-kicker purple">SELECTED IMAGE</span><h3>{selectedResult.label}</h3><p>File: {selectedResult.file_name || selectedResult.demo_url.split('/').pop()} • {selectedResult.matching_methods.join(' + ')} {selectedResult.phash_distance != null ? `• pHash ${selectedResult.phash_distance}/64` : ''}</p></div><button className="quiet-button" onClick={finishSelection}>Cancel</button></div>
+        <div className="save-head"><div><span className="section-kicker purple">SELECTED IMAGE</span><h3>{selectedResult.label}</h3><p>File: {selectedResult.file_name || (selectedResult.demo_url || '').split('/').pop()} • {selectedResult.matching_methods.join(' + ')} {selectedResult.phash_distance != null ? `• pHash ${selectedResult.phash_distance}/64` : ''}</p></div><button className="quiet-button" onClick={finishSelection}>Cancel</button></div>
         <label className="field-label" htmlFor="source-type">Where was this found? (demo)</label>
         <select id="source-type" value={sourceType} onChange={event => setSourceType(event.target.value)}>
-          <option value="local">Sample image collection</option>
+          {selectedResult.source === 'unsplash'
+            ? <option value="unsplash">Unsplash test collection</option>
+            : <option value="local">Sample image collection</option>}
           <option value="reddit">Fictional Reddit example</option>
         </select>
         {sourceType === 'reddit' && <p className="fiction-warning">SIMULATED: “Found match on Reddit” is a made-up scenario. The URL is intentionally fictitious. No search of Reddit has occurred.</p>}
@@ -284,12 +301,12 @@ export default function EvidenceWorkspace({ selectedResult, queryLabel, clearSel
       {!selectedResult && <p className="instruct">When you find a possible match, choose <strong>Save to vault</strong> to keep it here.</p>}
       <div className="vault-count"><strong>{records.length} saved demonstration record{records.length === 1 ? '' : 's'}</strong><span>On this device • previews hidden</span></div>
       {records.length ? <div className="vault-list">{records.map((record, index) => <article key={record.id} className="vault-record">
-        <div className="vault-record-top"><div><span className={record.sourceIsFictional ? 'demo-stamp' : 'reference-stamp'}>{record.sourceIsFictional ? 'FICTIONAL REDDIT' : 'LOCAL DEMO REFERENCE'}</span><h3>{record.referenceFileName}</h3></div><button className="quiet-button remove" ref={node => {
+        <div className="vault-record-top"><div><span className={record.sourceIsFictional ? 'demo-stamp' : 'reference-stamp'}>{record.sourceIsFictional ? 'FICTIONAL REDDIT' : record.sourceKind === 'unsplash' ? 'UNSPLASH TEST PHOTO' : 'LOCAL DEMO REFERENCE'}</span><h3>{record.referenceFileName}</h3></div><button className="quiet-button remove" ref={node => {
           if (node) deleteButtonRefs.current.set(record.id, node);
           else deleteButtonRefs.current.delete(record.id);
         }} aria-label={`Delete: saved record ${index + 1}`} onClick={() => removeRecord(record)}>Delete</button></div>
         <div className="evidence-metadata"><span><b>Source</b>{record.sourcePlatform}</span><span><b>Recorded</b>{formatDate(record.discoveredAt)}</span><span><b>Matching</b>{record.matchingMethods.join(', ')}</span><span><b>pHash</b>{record.phashDistance == null ? 'Not used' : `${record.phashDistance} / 64`}</span><span><b>Review</b>Unverified lead</span><span><b>Reporting</b>{statuses.find(s => s[0] === record.reportStatus)?.[1] || 'Not reported'}</span></div>
-        <details className="metadata-details"><summary>File integrity and notes</summary><p>Reference SHA-256: <code>{record.referenceSha256 || 'Not available'}</code></p>{record.sourceIsFictional && <p>Fictional source URL (do not use as evidence): <code>{record.sourceUrl}</code></p>}<p>Notes: {record.notes || 'None'}</p></details>
+        <details className="metadata-details"><summary>File integrity and notes</summary><p>Reference SHA-256: <code>{record.referenceSha256 || 'Not available'}</code></p>{record.sourceIsFictional && <p>Fictional source URL (do not use as evidence): <code>{record.sourceUrl}</code></p>}{record.sourceKind === 'unsplash' && /^https:\/\/unsplash\.com\//.test(record.sourceUrl || '') && <p>Found at: <a href={record.sourceUrl} target="_blank" rel="noopener noreferrer">{record.sourceUrl}</a></p>}<p>Notes: {record.notes || 'None'}</p></details>
         <div className="vault-record-actions"><RecordPreview imageBlob={record.imageBlob} recordNumber={index + 1}/>{record.sourceIsFictional && <button className="outlined-button" aria-label={`Reporting guide: saved record ${index + 1}`} onClick={() => {
           setReportId(record.id);
           window.requestAnimationFrame(() => {

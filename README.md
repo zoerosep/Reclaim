@@ -190,3 +190,5 @@ The command-line image engine in `reclaim-fullstack-baseline/image-engine/` is n
 - **Key setup:** copy `.env.example` to `.env` in the project folder and put the Unsplash access key after `UNSPLASH_ACCESS_KEY=`. Restart the backend. `.env` is ignored by git; never commit the key. Without a key, everything else still works and `/api/health` reports the Unsplash source as unavailable.
 - **Rate limit:** Unsplash demo keys allow 50 API requests per hour. Each category search costs one request, results are remembered for an hour, and image downloads do not count.
 - **Tests** use a simulated Unsplash, so they need no key and no internet.
+
+**In the page:** under *Start with an image*, **Where should we look?** switches between the sample image library and the Unsplash test photos (with a category). Every search also shows **About the image you searched with**, the image processor's report. An Unsplash match can be saved to the vault like a sample match: the record keeps a small preview, the match details and the address of the Unsplash photo page it was found at. Without an Unsplash key the option is shown but switched off, with the reason.
