@@ -78,7 +78,8 @@ def perceptual_hash(image: Image.Image, hash_size: int = 8, highfreq_factor: int
 
 
 def hamming(a: str, b: str) -> int:
-    return (int(a, 16) ^ int(b, 16)).bit_count()
+    # bin().count works on Python 3.9; int.bit_count() needs 3.10+
+    return bin(int(a, 16) ^ int(b, 16)).count('1')
 
 
 def cosine_similarity(first: list[float], second: list[float]) -> float:
