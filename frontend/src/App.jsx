@@ -6,6 +6,7 @@ import SelfSearch from './SelfSearch.jsx';
 import ImageDetails from './ImageDetails.jsx';
 import { WhyItMattersPage, GetHelpPage } from './InfoPages.jsx';
 import reclaimLogo from './assets/reclaim-logo.png';
+import './steps.css';
 
 const FALLBACK_DEMOS = [
   { id: 'garden-original', label: 'Garden original', demo_url: '/samples/garden-original.png' },
@@ -309,6 +310,12 @@ function App() {
   <p className="lead">
     Helping survivors regain control of their digital lives with privacy, support, and the freedom to choose what happens next.
   </p>
+  <ol className="steps-strip" aria-label="How Reclaim works, in four steps">
+    <li><span className="steps-number" aria-hidden="true">1</span><strong>Search</strong><span>Start with an image</span></li>
+    <li><span className="steps-number" aria-hidden="true">2</span><strong>Review</strong><span>Look at possible matches</span></li>
+    <li><span className="steps-number" aria-hidden="true">3</span><strong>Save</strong><span>Keep evidence on your device</span></li>
+    <li><span className="steps-number" aria-hidden="true">4</span><strong>Report</strong><span>Follow each platform's steps</span></li>
+  </ol>
 </section>
         <div className="working-layout" data-scroll-reveal>
           <section className="panel controls-panel" aria-labelledby="search-heading">
