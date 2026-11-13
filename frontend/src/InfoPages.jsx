@@ -139,13 +139,13 @@ export function WhyItMattersPage({ onNavigate }) {
     <InfoHeader label="Why it matters" title="Why Reclaim matters" subtitle="Nonconsensual image sharing can reach far beyond the original post. Understanding the scope is one part of making tools and support easier to find." />
 
     <section className="facts-section" aria-label="Five statistics about image-based abuse and online harassment">
-      <div className="facts-grid">
-        {STATS.map((stat, i) => <article className="fact-card" key={i} data-scroll-reveal>
+      <div className="facts-grid" data-scroll-reveal>
+        {STATS.map((stat, i) => <article className="fact-card" key={i}>
           <p className="fact-type">{stat.category}</p>
           <p className="fact-figure">{stat.value}</p>
           <p className="fact-description">{stat.text}<sup><a href={`#source-${i+1}`} aria-label={`Read source ${i+1}`}>{i+1}</a></sup></p>
         </article>)}
-        <article className="fact-card fact-cta" data-scroll-reveal>
+        <article className="fact-card fact-cta">
           <p className="fact-type">Explore the project</p>
           <h2>From awareness to options.</h2>
           <p>See how our demo approaches discovery, review, saving and reporting.</p>
@@ -184,8 +184,8 @@ export function GetHelpPage() {
   return <div className="info-page help-page">
     <InfoHeader label="Get help" title="Support, when you want it." subtitle="Explore emotional support, evidence guidance, content removal, legal information, or optional AI tools. You choose where to begin." />
 
-    <nav className="help-quick-links" aria-label="Choose a kind of help">
-      {HELP_GROUPS.map(group => <a key={group.id} href={`#${group.id}`} className="help-quick-link" data-scroll-reveal>
+    <nav className="help-quick-links" aria-label="Choose a kind of help" data-scroll-reveal>
+      {HELP_GROUPS.map(group => <a key={group.id} href={`#${group.id}`} className="help-quick-link">
         <span className="help-quick-number">{group.number}</span>
         <span>{group.navLabel}</span>
         <span className="help-quick-arrow" aria-hidden="true">↓</span>
