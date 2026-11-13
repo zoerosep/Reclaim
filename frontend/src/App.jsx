@@ -6,6 +6,7 @@ import SelfSearch from './SelfSearch.jsx';
 import ImageDetails from './ImageDetails.jsx';
 import { WhyItMattersPage, GetHelpPage } from './InfoPages.jsx';
 import reclaimLogo from './assets/reclaim-logo.png';
+import ThemeToggle from './ThemeToggle.jsx';
 import './steps.css';
 
 const FALLBACK_DEMOS = [
@@ -296,6 +297,7 @@ function App() {
         <span className="nav-wordmark">Reclaim</span>
 
         <nav className="nav-links" aria-label="Main navigation">
+          <ThemeToggle />
           <a href="/" aria-current={page === 'app' ? 'page' : undefined} onClick={event => navigate(event, '/')}>App</a>
           <a href="/why-it-matters" aria-current={page === 'why' ? 'page' : undefined} onClick={event => navigate(event, '/why-it-matters')}>Why it matters</a>
           <a href="/get-help" aria-current={page === 'help' ? 'page' : undefined} onClick={event => navigate(event, '/get-help')}>Get help</a>
