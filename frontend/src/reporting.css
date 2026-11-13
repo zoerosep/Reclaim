@@ -1,0 +1,4 @@
+/* Notes under the platform reporting guides. */
+.platform-note { margin: 12px 0 0; padding: 10px 12px; border-left: 3px solid var(--steel-light); border-radius: 5px; background: var(--surface-soft); color: var(--muted); font-size: var(--size-meta); line-height: 1.6; }
+.platform-note a { color: var(--steel-light); }
+.platform-note-warning { border-left-color: #E3C48E; color: #F2D9B5; }
