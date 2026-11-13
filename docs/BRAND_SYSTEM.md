@@ -25,14 +25,15 @@ The main navigation is charcoal, the input/search panel has a forest top border,
 ## Typography
 
 ### Families
-- UI and editorial: `Georgia, "Times New Roman", serif`.
+- Body text and labels: `Georgia, "Times New Roman", serif`.
+- Headings and titles: `Montserrat` (semi-bold), bundled in `frontend/src/assets/fonts`.
 - No Proxima Nova installation or paid license needed for this baseline.
 
-Georgia is a common system serif with platform fallbacks. No font files are bundled or requested from external servers. The brand palette remains unchanged.
+Georgia is a common system serif with platform fallbacks. Montserrat is bundled with the app under the SIL Open Font License, so nothing is requested from external servers. The brand palette remains unchanged.
 
 ### Five semantic type roles (practical reinterpretation of the Five Point Rule)
-1. **Editorial display:** Georgia, ~36–62px depending on screen, charcoal with limited amethyst emphasis.
-2. **Section title:** Georgia, ~24px, charcoal.
+1. **Editorial display:** Montserrat, ~36–62px depending on screen, charcoal with limited amethyst emphasis.
+2. **Section title:** Montserrat, ~24px, charcoal.
 3. **Body:** Georgia/fallback, ~16–17px, charcoal or steel.
 4. **Interface/control:** Georgia/fallback, ~15–16px, charcoal, forest, amethyst, or inverse on dark surfaces.
 5. **Metadata:** Georgia/fallback, ~13px, steel or appropriately contrasting brand ink.

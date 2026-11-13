@@ -300,7 +300,7 @@ function App() {
           <a href="/get-help" aria-current={page === 'help' ? 'page' : undefined} onClick={event => navigate(event, '/get-help')}>Get help</a>
         </nav>
       </header>
-      <main id="main-content" ref={mainRef} tabIndex={-1}>
+      <main id="main-content" className={page === 'app' ? 'app-page' : undefined} ref={mainRef} tabIndex={-1}>
         {page === 'why' ? <WhyItMattersPage onNavigate={navigate} /> : page === 'help' ? <GetHelpPage /> : (
           <>
         <section className="hero" aria-labelledby="page-title" data-scroll-reveal>
@@ -316,7 +316,6 @@ function App() {
               <div>
                 <p className="section-kicker">Discover</p>
                 <h2 id="search-heading">Start with an image</h2>
-                <p>Choose one of our sample images, or add a harmless test image of your own.</p>
               </div>
             </div>
 
@@ -337,7 +336,7 @@ function App() {
             <input hidden ref={picker} type="file" accept="image/png,image/jpeg,image/webp" onChange={onChoose} />
             <button className="upload" onClick={() => picker.current?.click()} disabled={cannotSearch}>
               <span className="upload-icon" aria-hidden="true">+</span>
-              <span><strong>Choose a test image</strong><small>PNG, JPG, or WebP • up to 8 MB</small></span>
+              <span><strong>Choose a test image</strong></span>
             </button>
 
             <details className="method-details">
@@ -366,7 +365,6 @@ function App() {
               )}
             </details>
 
-            <p className="demo-note">This demonstration compares only approved sample images, not the live internet. Please don't upload intimate or sensitive material.</p>
             {error && <div className="error" role="alert">{error}</div>}
           </section>
 
@@ -375,7 +373,6 @@ function App() {
               <div>
                 <p className="section-kicker purple">Review</p>
                 <h2 id="results-heading">Possible matches</h2>
-                <p>Take a look. You decide what to save.</p>
               </div>
             </div>
             {loading ? (
