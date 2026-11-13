@@ -1,0 +1,18 @@
+/* Styles for the image-processor additions (search source picker and image details).
+   Kept in their own file so they do not collide with edits to styles.css. */
+.source-settings { margin: 0 0 18px; padding: 14px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface-soft); display: grid; gap: 8px; }
+.source-settings label { font-size: var(--size-interface); font-weight: 700; color: var(--text); }
+.source-settings label + select + label { margin-top: 6px; }
+.source-settings select { width: 100%; }
+.source-settings small { font-size: var(--size-meta); color: var(--subtle); line-height: 1.6; }
+
+.image-details { margin: 0 0 17px; padding: 12px 14px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface-soft); }
+.image-details code { overflow-wrap: anywhere; }
+.image-details-flag { color: #F2D9B5; }
+.image-details-footnote, .image-details-unavailable { color: var(--subtle); font-size: var(--size-meta); }
+.image-metadata { margin-top: 8px; }
+.image-metadata summary { color: var(--violet-light); }
+.image-metadata dl { margin: 8px 0 0; max-height: 260px; overflow: auto; display: grid; gap: 6px; }
+.image-metadata dl > div { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 3fr); gap: 10px; }
+.image-metadata dt { color: var(--subtle); overflow-wrap: anywhere; }
+.image-metadata dd { margin: 0; color: var(--text); overflow-wrap: anywhere; }

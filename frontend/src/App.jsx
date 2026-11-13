@@ -1,6 +1,8 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { flushSync } from 'react-dom';
 import EvidenceWorkspace from './EvidenceWorkspace.jsx';
+import SearchSource from './SearchSource.jsx';
+import ImageDetails from './ImageDetails.jsx';
 import { WhyItMattersPage, GetHelpPage } from './InfoPages.jsx';
 import reclaimLogo from './assets/reclaim-logo.png';
 
@@ -162,6 +164,9 @@ function App() {
   const [methods, setMethods] = useState(['sha256']);
   const [methodNotice, setMethodNotice] = useState('');
   const [phashScope, setPhashScope] = useState('exploratory');
+  const [source, setSource] = useState('local'); // 'local' sample library or 'unsplash' test photos
+  const [category, setCategory] = useState('portrait');
+  const [analysis, setAnalysis] = useState(null); // image-processor report for the searched image
   const [results, setResults] = useState(null);
   const [queryLabel, setQueryLabel] = useState('');
   const [selectedResult, setSelectedResult] = useState(null);
@@ -179,8 +184,10 @@ function App() {
         ]);
         if (!status.ok || !references.ok) throw new Error('The Python API is not available. Start the backend in VS Code first.');
         if (active) {
+          const rows = await references.json();
           setHealth(await status.json());
-          setCatalog(await references.json());
+          setCatalog(rows);
+          if (!rows.length) setError('The sample image library is empty. Stop the Python backend, run "python -m backend.scripts.seed_demo" from the project folder, then start it again.');
         }
       } catch {
         if (active) setError('Python backend not connected. Check that Uvicorn is running on localhost:8000 and that you seeded the demo catalog.');
@@ -208,20 +215,29 @@ function App() {
       if (error === message) flushSync(() => setError(''));
       setError(message); return;
     }
-    setError(''); setLoading(true); setResults(null); setSelectedResult(null);
+    setError(''); setLoading(true); setResults(null); setSelectedResult(null); setAnalysis(null);
     try {
-      const params = new URLSearchParams({ methods: methods.join(','), phash_scope: phashScope });
-      const response = await fetch(`/api/search?${params.toString()}`, {
+      const upload = {
         method: 'POST',
         headers: { 'Content-Type': file.type || 'application/octet-stream' },
         body: file, // image data is sent to the LOCAL Python backend, not a public search site
         cache: 'no-store',
-      });
+      };
+      const searchUrl = useUnsplash
+        ? `/api/search/unsplash?${new URLSearchParams({ category, phash_scope: phashScope })}`
+        : `/api/search?${new URLSearchParams({ methods: methods.join(','), phash_scope: phashScope })}`;
+      // The search and the image-processor report run side by side. A problem
+      // with the report never hides the search results.
+      const [response, report] = await Promise.all([
+        fetch(searchUrl, upload),
+        fetch('/api/analyze', upload).then(reply => (reply.ok ? reply.json() : { status: 'failed' })).catch(() => ({ status: 'failed' })),
+      ]);
       if (!response.ok) {
         const details = await response.json().catch(() => null);
         throw new Error(details?.detail || `Search failed with HTTP ${response.status}`);
       }
       setResults(await response.json());
+      setAnalysis(report);
       setQueryLabel(label);
     } catch (err) {
       setError(err.message || 'The search could not finish.');
@@ -250,7 +266,13 @@ function App() {
 
   const demos = catalog.filter(c => FALLBACK_DEMOS.some(d => d.id === c.id));
 
-  const methodSummary = methods.includes('phash')
+  // Unsplash test photos are compared by visual similarity (pHash) only.
+  const useUnsplash = source === 'unsplash' && Boolean(health?.unsplash?.available);
+  const cannotSearch = loading || !health || (!useUnsplash && !catalog.length);
+  const fromUnsplash = results?.source === 'unsplash';
+
+  const methodSummary = useUnsplash ? 'Similar images'
+    : methods.includes('phash')
     ? (methods.includes('sha256') ? 'Exact + similar images' : 'Similar images')
     : 'Exact files';
 
@@ -295,16 +317,22 @@ function App() {
               </div>
             </div>
 
+            <SearchSource
+              health={health} disabled={loading}
+              source={source} onSourceChange={value => { setSource(value); setResults(null); setAnalysis(null); }}
+              category={category} onCategoryChange={value => { setCategory(value); setResults(null); setAnalysis(null); }}
+            />
+
             <div className="demo-row">
               {(demos.length ? demos : FALLBACK_DEMOS).map(demo => (
-                <button className="demo-option" key={demo.id} aria-label={demo.label} onClick={() => runDemo(demo)} disabled={loading || !health || !catalog.length}>
+                <button className="demo-option" key={demo.id} aria-label={demo.label} onClick={() => runDemo(demo)} disabled={cannotSearch}>
                   <img src={demo.demo_url} alt="" />
                   <span>{demo.label.split(' ')[0]}</span>
                 </button>
               ))}
             </div>
             <input hidden ref={picker} type="file" accept="image/png,image/jpeg,image/webp" onChange={onChoose} />
-            <button className="upload" onClick={() => picker.current?.click()} disabled={loading || !health || !catalog.length}>
+            <button className="upload" onClick={() => picker.current?.click()} disabled={cannotSearch}>
               <span className="upload-icon" aria-hidden="true">+</span>
               <span><strong>Choose a test image</strong><small>PNG, JPG, or WebP • up to 8 MB</small></span>
             </button>
@@ -323,7 +351,7 @@ function App() {
                 </label>
               </div>
               <span role="status" style={{ position: 'absolute', width: 1, height: 1, padding: 0, margin: -1, overflow: 'hidden', clipPath: 'inset(50%)', whiteSpace: 'nowrap', border: 0 }}>{methodNotice}</span>
-              {methods.includes('phash') && (
+              {(methods.includes('phash') || useUnsplash) && (
                 <div className="phash-settings">
                   <label htmlFor="phash-scope">How broad should the comparison be?</label>
                   <select id="phash-scope" value={phashScope} onChange={event => { setPhashScope(event.target.value); setResults(null); }}>
@@ -354,13 +382,14 @@ function App() {
             ) : (
               <>
                 <div className="summary" role="status">
-                  <div><h3>{results.results.length} possible match{results.results.length === 1 ? '' : 'es'}</h3><p>{queryLabel} • Local demo results only</p></div>
+                  <div><h3>{results.results.length} possible match{results.results.length === 1 ? '' : 'es'}</h3><p>{queryLabel} • {fromUnsplash ? `Compared with ${results.checked_references} Unsplash test photo${results.checked_references === 1 ? '' : 's'} (${results.category})` : 'Local demo results only'}</p></div>
                 </div>
+                <ImageDetails analysis={analysis} />
                 {results.results.length ? (
                   <div className="result-list">
                     {results.results.map((item, index) => (
                       <article className="result" key={item.id}>
-                        <div className="result-thumb"><img src={item.demo_url} alt="" /></div>
+                        <div className="result-thumb"><img src={item.thumbnail_url || item.demo_url} alt="" /></div>
                         <div className="result-body">
                           <span className={`verdict ${item.exact ? 'exact' : item.phash_tier === 'exploratory' ? 'low' : 'possible'}`}>
                             {item.exact ? 'Exact file' : item.phash_tier === 'close' ? 'Close visual match' : 'Possible visual match'}
@@ -371,6 +400,9 @@ function App() {
                             {item.phash_distance != null && <p>pHash distance: {item.phash_distance} of 64</p>}
                             {item.openclip_cosine != null && <p>Embedding similarity: {item.openclip_cosine}</p>}
                             <p>Reference type: {item.kind}</p>
+                            {item.source === 'unsplash' && /^https:\/\/unsplash\.com\//.test(item.source_url || '') && (
+                              <p>Found at: <a href={item.source_url} target="_blank" rel="noopener noreferrer">Unsplash photo page <span aria-hidden="true">↗</span></a></p>
+                            )}
                           </details>
                           <button className="save-result-button" aria-label={`Save to vault: result ${index + 1}`} onClick={() => {
                             setSelectedResult(item);
@@ -384,9 +416,13 @@ function App() {
                     ))}
                   </div>
                 ) : (
-                  <div className="empty small"><h3>No matches in this demo collection</h3><p>That doesn't mean the image isn't somewhere else.</p></div>
+                  fromUnsplash
+                    ? <div className="empty small"><h3>No matches among these Unsplash photos</h3><p>A match only appears when your image is one of the top photos for that category.</p></div>
+                    : <div className="empty small"><h3>No matches in this demo collection</h3><p>That doesn't mean the image isn't somewhere else.</p></div>
                 )}
-                <p className="results-bottom">These are possible matches in a sample library, not confirmed findings on the internet.</p>
+                <p className="results-bottom">{fromUnsplash
+                  ? 'These are possible matches in a small Unsplash test collection, not confirmed findings on the internet.'
+                  : 'These are possible matches in a sample library, not confirmed findings on the internet.'}</p>
               </>
             )}
           </section>
