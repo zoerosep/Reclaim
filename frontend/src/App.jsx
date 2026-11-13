@@ -257,42 +257,32 @@ function App() {
   return (
     <div className="site">
       <a className="skip-link" href="#main-content" onClick={() => mainRef.current?.focus({ preventScroll: true })}>Skip to main content</a>
-     <header className="nav">
-  <a
-    className="brand brand-link"
-    href="/"
-    onClick={event => navigate(event, '/')}
-    aria-label="Reclaim home"
-  >
-    <img
-  className="brand-logo"
-  src={reclaimLogo}
-  alt="RECLAIM"
-/>
+      <header className="nav">
+        <a
+          className="brand brand-link"
+          href="/"
+          onClick={event => navigate(event, '/')}
+          aria-label="Reclaim home"
+        >
+          <img className="brand-logo" src={reclaimLogo} alt="RECLAIM" />
+        </a>
 
-  </a>
+        <span className="nav-wordmark">Reclaim</span>
 
-  <nav className="nav-links" aria-label="Main navigation">
-    <a href="/" aria-current={page === 'app' ? 'page' : undefined}
-      onClick={event => navigate(event, '/')}>App</a>
-    <a href="/why-it-matters"
-      aria-current={page === 'why' ? 'page' : undefined}
-      onClick={event => navigate(event, '/why-it-matters')}>Why it matters</a>
-    <a href="/get-help"
-      aria-current={page === 'help' ? 'page' : undefined}
-      onClick={event => navigate(event, '/get-help')}>Get help</a>
-  </nav>
-</header>
+        <nav className="nav-links" aria-label="Main navigation">
+          <a href="/" aria-current={page === 'app' ? 'page' : undefined} onClick={event => navigate(event, '/')}>App</a>
+          <a href="/why-it-matters" aria-current={page === 'why' ? 'page' : undefined} onClick={event => navigate(event, '/why-it-matters')}>Why it matters</a>
+          <a href="/get-help" aria-current={page === 'help' ? 'page' : undefined} onClick={event => navigate(event, '/get-help')}>Get help</a>
+        </nav>
+      </header>
       <main id="main-content" ref={mainRef} tabIndex={-1}>
         {page === 'why' ? <WhyItMattersPage onNavigate={navigate} /> : page === 'help' ? <GetHelpPage /> : (
           <>
         <section className="hero" aria-labelledby="page-title" data-scroll-reveal>
-  <h1 id="page-title">Reclaim</h1>
+  <h1 id="page-title">Our Mission:</h1>
 
   <p className="lead">
-    Helping survivors regain control of their digital lives
-    with privacy, support, and the freedom to choose what
-    happens next.
+    Helping survivors regain control of their digital lives with privacy, support, and the freedom to choose what happens next.
   </p>
 </section>
         <div className="working-layout">
