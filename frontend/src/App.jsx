@@ -128,47 +128,33 @@ function App() {
 
   return (
     <div className="site">
-     <header className="nav">
-  <a
-    className="brand brand-link"
-    href="/"
-    onClick={event => navigate(event, '/')}
-    aria-label="Reclaim home"
-  >
-    <img
-  className="brand-logo"
-  src={reclaimLogo}
-  alt="RECLAIM"
-/>
-    
-    </a>
+      <header className="nav">
+        <a
+          className="brand brand-link"
+          href="/"
+          onClick={event => navigate(event, '/')}
+          aria-label="Reclaim home"
+        >
+          <img className="brand-logo" src={reclaimLogo} alt="RECLAIM" />
+        </a>
 
-  <span className="nav-wordmark">Reclaim</span>
+        <span className="nav-wordmark">Reclaim</span>
 
-  <nav className="nav-links" aria-label="Main navigation">
-    <a href="/" aria-current={page === 'app' ? 'page' : undefined}
-      onClick={event => navigate(event, '/')}>App</a>
-    <a href="/why-it-matters"
-      aria-current={page === 'why' ? 'page' : undefined}
-      onClick={event => navigate(event, '/why-it-matters')}>Why it matters</a>
-    <a href="/get-help"
-      aria-current={page === 'help' ? 'page' : undefined}
-            onClick={event => navigate(event, '/get-help')}>Get help</a>
-      
-  </nav>
-</header>
+        <nav className="nav-links" aria-label="Main navigation">
+          <a href="/" aria-current={page === 'app' ? 'page' : undefined} onClick={event => navigate(event, '/')}>App</a>
+          <a href="/why-it-matters" aria-current={page === 'why' ? 'page' : undefined} onClick={event => navigate(event, '/why-it-matters')}>Why it matters</a>
+          <a href="/get-help" aria-current={page === 'help' ? 'page' : undefined} onClick={event => navigate(event, '/get-help')}>Get help</a>
+        </nav>
+      </header>
       <main id="main-content">
         {page === 'why' ? <WhyItMattersPage onNavigate={navigate} /> : page === 'help' ? <GetHelpPage /> : (
           <>
         <section className="hero" aria-labelledby="page-title">
-  <h2 id="page-title">Our Mission:</h2>
-
-  <p className="lead">
-    Helping survivors regain control of their digital lives
-    with privacy, support, and the freedom to choose what
-    happens next.
-  </p>
-</section>
+          <h1 id="page-title">Our Mission:</h1>
+          <p className="lead">
+            Helping survivors regain control of their digital lives with privacy, support, and the freedom to choose what happens next.
+          </p>
+        </section>
         <div className="working-layout">
           <section className="panel controls-panel" aria-labelledby="search-heading">
             <div className="panel-head">
