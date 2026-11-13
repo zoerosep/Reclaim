@@ -1,7 +1,8 @@
 /**
  * Hackathon demo vault. IndexedDB stores selected safe demo reference images as
- * Blobs and metadata. IndexedDB is NOT encrypted at rest; do not store real NCII.
- * No network requests are made by this module.
+ * Blobs and metadata, plus text-only records a person adds by hand (web address,
+ * date and notes, never an image). IndexedDB is NOT encrypted at rest; do not
+ * store real NCII. No network requests are made by this module.
  */
 const DB_NAME = 'reclaim-demo-vault-v1';
 const STORE = 'evidence';

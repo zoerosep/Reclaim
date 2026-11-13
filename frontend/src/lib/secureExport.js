@@ -3,6 +3,8 @@
  * PBKDF2(SHA-256, 310k iterations) -> AES-256-GCM, random salt & nonce.
  * This is not an independently audited archival/forensic security system.
  */
+import { isManualRecord, restoreManualRecord } from './manualRecords.js';
+
 const ITERATIONS = 310000;
 const encoder = new TextEncoder();
 const decoder = new TextDecoder();
@@ -49,13 +51,16 @@ function dataUrlToBlob(uri) {
   return new Blob([base64ToBytes(raw)], { type });
 }
 
-/** Package metadata and explicitly saved reference preview blobs only. */
+/**
+ * Package metadata and explicitly saved reference preview blobs only.
+ * Hand-added records have no image, so they are packaged as text alone.
+ */
 export async function encryptEvidence(records, password) {
   requireCrypto();
   if (password.length < 12) throw new Error('Use a passphrase at least 12 characters long.');
   const entries = [];
   for (const { imageBlob, ...meta } of records) {
-    entries.push({ ...meta, imageDataUrl: await fileToDataUrl(imageBlob) });
+    entries.push({ ...meta, imageDataUrl: imageBlob ? await fileToDataUrl(imageBlob) : null });
   }
   const payload = encoder.encode(JSON.stringify({
     format: 'reclaim-demo-evidence', version: 1, demo_only: true,
@@ -97,6 +102,8 @@ export async function decryptEvidence(file, password) {
     throw new Error('This package has an invalid evidence manifest.');
   }
   return data.entries.map(({ imageDataUrl, ...meta }) => {
+    // Hand-added records are text only. Any image attached to one is ignored.
+    if (isManualRecord(meta)) return restoreManualRecord(meta);
     if (!meta.id || !meta.demoOnly || !meta.referenceFileName) throw new Error('Invalid demonstration evidence record.');
     return { ...meta, imageBlob: dataUrlToBlob(imageDataUrl) };
   });
