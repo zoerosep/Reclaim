@@ -1,5 +1,5 @@
 /* RECLAIM — GDI Hackathon 2026
- * Dark, quiet interface. Georgia headings and Times New Roman body; no external font service required.
+ * Dark, quiet interface. Georgia throughout (body and headings); no external font service required.
  * UI only: this stylesheet does not change image processing or storage.
  */
 :root {
@@ -28,7 +28,7 @@
   --subtle: #ADB5C0;
   --focus-ring: #C2A8D3;
   --sticky-header-clearance: 8rem;
-  --font-ui: 'Times New Roman', Times, serif;
+  --font-ui: Georgia, 'Times New Roman', serif;
   --font-editorial: Georgia, 'Times New Roman', serif;
   --size-body: 1rem;
   --size-interface: .9375rem;
