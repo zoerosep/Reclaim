@@ -1,4 +1,5 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { flushSync } from 'react-dom';
 import EvidenceWorkspace from './EvidenceWorkspace.jsx';
 import { WhyItMattersPage, GetHelpPage } from './InfoPages.jsx';
 import reclaimLogo from './assets/reclaim-logo.png';
@@ -17,6 +18,125 @@ function currentRoute() {
 
 function App() {
   const [page, setPage] = useState(currentRoute);
+  const mainRef = useRef(null);
+  const savedEvidenceHeadingRef = useRef(null);
+  const previousPageRef = useRef(page);
+  const [showBackToTop, setShowBackToTop] = useState(false);
+  const [backToTopFocused, setBackToTopFocused] = useState(false);
+  const pastScrollThresholdRef = useRef(false);
+
+  useLayoutEffect(() => {
+    const main = mainRef.current;
+    if (!main?.animate || !window.IntersectionObserver) return;
+    const motionPreference = window.matchMedia('(prefers-reduced-motion: reduce)');
+    if (motionPreference.matches) return;
+    const revealed = new WeakSet();
+    const animations = new Map();
+    let stopped = false;
+    const observer = new IntersectionObserver(entries => {
+      if (stopped) return;
+      entries.forEach(({ target, isIntersecting }) => {
+        if (!isIntersecting || revealed.has(target)) return;
+        revealed.add(target);
+        observer.unobserve(target);
+        if (target.contains(document.activeElement)) return;
+        const animation = target.animate(
+          [{ transform: 'translateY(8px)', opacity: 0.96 }, { transform: 'translateY(0)', opacity: 1 }],
+          { duration: 1200, easing: 'ease-in-out' },
+        );
+        animations.set(target, animation);
+        animation.onfinish = () => animations.delete(target);
+      });
+    });
+    function revealWithoutMotion(target) {
+      if (!target || !main.contains(target)) return;
+      revealed.add(target);
+      observer.unobserve(target);
+      animations.get(target)?.cancel();
+      animations.delete(target);
+    }
+    function onCardFocus(event) {
+      revealWithoutMotion(event.target.closest('[data-scroll-reveal]'));
+    }
+    function skipAnchorReveal(hash) {
+      if (!hash) return;
+      let id;
+      try { id = decodeURIComponent(hash.slice(1)); } catch { return; }
+      const destination = document.getElementById(id);
+      revealWithoutMotion(destination?.closest('[data-scroll-reveal]'));
+    }
+    function onAnchorClick(event) {
+      if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+      const link = event.target.closest('a[href^="#"]');
+      if (link) skipAnchorReveal(link.hash);
+    }
+    function onHashChange() {
+      skipAnchorReveal(window.location.hash);
+    }
+    function stopReveals() {
+      stopped = true;
+      observer.disconnect();
+      animations.forEach(animation => animation.cancel());
+      animations.clear();
+    }
+    function onMotionPreferenceChange(event) {
+      if (event.matches) stopReveals();
+    }
+    onHashChange();
+    main.querySelectorAll('[data-scroll-reveal]').forEach(card => {
+      if (card.contains(document.activeElement)) revealed.add(card);
+      else if (!revealed.has(card)) observer.observe(card);
+    });
+    main.addEventListener('focusin', onCardFocus);
+    main.addEventListener('click', onAnchorClick);
+    window.addEventListener('hashchange', onHashChange);
+    motionPreference.addEventListener('change', onMotionPreferenceChange);
+    return () => {
+      stopReveals();
+      main.removeEventListener('focusin', onCardFocus);
+      main.removeEventListener('click', onAnchorClick);
+      window.removeEventListener('hashchange', onHashChange);
+      motionPreference.removeEventListener('change', onMotionPreferenceChange);
+    };
+  }, [page]);
+
+  useEffect(() => {
+    function updateBackToTop() {
+      const pastThreshold = window.scrollY >= 400;
+      if (pastThreshold === pastScrollThresholdRef.current) return;
+      pastScrollThresholdRef.current = pastThreshold;
+      setShowBackToTop(pastThreshold);
+    }
+    updateBackToTop();
+    window.addEventListener('scroll', updateBackToTop, { passive: true });
+    window.addEventListener('pageshow', updateBackToTop);
+    return () => {
+      window.removeEventListener('scroll', updateBackToTop);
+      window.removeEventListener('pageshow', updateBackToTop);
+    };
+  }, [page]);
+
+  function backToTop() {
+    const heading = mainRef.current?.querySelector('h1');
+    if (heading) {
+      heading.tabIndex = -1;
+      heading.focus({ preventScroll: true });
+    }
+    window.scrollTo({
+      top: 0,
+      behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth',
+    });
+  }
+
+  useEffect(() => {
+    if (previousPageRef.current === page) return;
+    previousPageRef.current = page;
+    const heading = mainRef.current?.querySelector('h1');
+    if (heading) {
+      heading.tabIndex = -1;
+      heading.focus({ preventScroll: true });
+    }
+  }, [page]);
 
   useEffect(() => {
     const onPopState = () => setPage(currentRoute());
@@ -40,6 +160,7 @@ function App() {
   const [health, setHealth] = useState(null);
   const [catalog, setCatalog] = useState([]);
   const [methods, setMethods] = useState(['sha256']);
+  const [methodNotice, setMethodNotice] = useState('');
   const [phashScope, setPhashScope] = useState('exploratory');
   const [results, setResults] = useState(null);
   const [queryLabel, setQueryLabel] = useState('');
@@ -71,6 +192,10 @@ function App() {
 
   function toggleMethod(method) {
     setResults(null);
+    setMethodNotice('');
+    if (methods.length === 1 && methods.includes(method)) {
+      window.requestAnimationFrame(() => setMethodNotice('At least one matching method must remain selected.'));
+    }
     setMethods(current => current.includes(method)
       ? (current.length === 1 ? current : current.filter(value => value !== method))
       : [...current, method]);
@@ -79,7 +204,9 @@ function App() {
   async function runSearch(file, label) {
     if (!file || loading) return;
     if (file.size > 8 * 1024 * 1024) {
-      setError('Choose a demo image smaller than 8 MB.'); return;
+      const message = 'Choose a demo image smaller than 8 MB.';
+      if (error === message) flushSync(() => setError(''));
+      setError(message); return;
     }
     setError(''); setLoading(true); setResults(null); setSelectedResult(null);
     try {
@@ -104,6 +231,7 @@ function App() {
   }
 
   async function runDemo(demo) {
+    setError('');
     try {
       const response = await fetch(demo.demo_url);
       if (!response.ok) throw new Error('Demo sample not found.');
@@ -128,6 +256,7 @@ function App() {
 
   return (
     <div className="site">
+      <a className="skip-link" href="#main-content" onClick={() => mainRef.current?.focus({ preventScroll: true })}>Skip to main content</a>
       <header className="nav">
         <a
           className="brand brand-link"
@@ -146,17 +275,18 @@ function App() {
           <a href="/get-help" aria-current={page === 'help' ? 'page' : undefined} onClick={event => navigate(event, '/get-help')}>Get help</a>
         </nav>
       </header>
-      <main id="main-content">
+      <main id="main-content" ref={mainRef} tabIndex={-1}>
         {page === 'why' ? <WhyItMattersPage onNavigate={navigate} /> : page === 'help' ? <GetHelpPage /> : (
           <>
-        <section className="hero" aria-labelledby="page-title">
-          <h1 id="page-title">Our Mission:</h1>
-          <p className="lead">
-            Helping survivors regain control of their digital lives with privacy, support, and the freedom to choose what happens next.
-          </p>
-        </section>
+        <section className="hero" aria-labelledby="page-title" data-scroll-reveal>
+  <h1 id="page-title">Our Mission:</h1>
+
+  <p className="lead">
+    Helping survivors regain control of their digital lives with privacy, support, and the freedom to choose what happens next.
+  </p>
+</section>
         <div className="working-layout">
-          <section className="panel controls-panel" aria-labelledby="search-heading">
+          <section className="panel controls-panel" aria-labelledby="search-heading" data-scroll-reveal>
             <div className="panel-head">
               <div>
                 <p className="section-kicker">Discover</p>
@@ -167,8 +297,8 @@ function App() {
 
             <div className="demo-row">
               {(demos.length ? demos : FALLBACK_DEMOS).map(demo => (
-                <button className="demo-option" key={demo.id} onClick={() => runDemo(demo)} disabled={loading || !health || !catalog.length}>
-                  <img src={demo.demo_url} alt={`Sample: ${demo.label}`} />
+                <button className="demo-option" key={demo.id} aria-label={demo.label} onClick={() => runDemo(demo)} disabled={loading || !health || !catalog.length}>
+                  <img src={demo.demo_url} alt="" />
                   <span>{demo.label.split(' ')[0]}</span>
                 </button>
               ))}
@@ -181,7 +311,8 @@ function App() {
 
             <details className="method-details">
               <summary><span>Matching options</span><small>{methodSummary}</small></summary>
-              <div className="methods">
+              <div className="methods" role="group" aria-label="Matching methods" aria-describedby="matching-method-instruction">
+                <span id="matching-method-instruction" hidden>At least one matching method must remain selected.</span>
                 <label className="method">
                   <input type="checkbox" checked={methods.includes('sha256')} onChange={() => toggleMethod('sha256')} />
                   <span><strong>Exact files</strong><small>Look for identical files (SHA-256).</small></span>
@@ -191,6 +322,7 @@ function App() {
                   <span><strong>Similar images</strong><small>Find some resized or compressed copies (pHash).</small></span>
                 </label>
               </div>
+              <span role="status" style={{ position: 'absolute', width: 1, height: 1, padding: 0, margin: -1, overflow: 'hidden', clipPath: 'inset(50%)', whiteSpace: 'nowrap', border: 0 }}>{methodNotice}</span>
               {methods.includes('phash') && (
                 <div className="phash-settings">
                   <label htmlFor="phash-scope">How broad should the comparison be?</label>
@@ -207,7 +339,7 @@ function App() {
             {error && <div className="error" role="alert">{error}</div>}
           </section>
 
-          <section className="panel results-panel" aria-labelledby="results-heading">
+          <section className="panel results-panel" aria-labelledby="results-heading" data-scroll-reveal>
             <div className="panel-head">
               <div>
                 <p className="section-kicker purple">Review</p>
@@ -226,23 +358,26 @@ function App() {
                 </div>
                 {results.results.length ? (
                   <div className="result-list">
-                    {results.results.map(item => (
+                    {results.results.map((item, index) => (
                       <article className="result" key={item.id}>
-                        <div className="result-thumb"><img src={item.demo_url} alt={`Demo reference: ${item.label}`} /></div>
+                        <div className="result-thumb"><img src={item.demo_url} alt="" /></div>
                         <div className="result-body">
                           <span className={`verdict ${item.exact ? 'exact' : item.phash_tier === 'exploratory' ? 'low' : 'possible'}`}>
                             {item.exact ? 'Exact file' : item.phash_tier === 'close' ? 'Close visual match' : 'Possible visual match'}
                           </span>
-                          <h4>{item.label}</h4>
+                          <h3>{item.label}</h3>
                           <details className="match-details"><summary>Match details</summary>
                             <p>Methods: {item.matching_methods.join(', ')}</p>
                             {item.phash_distance != null && <p>pHash distance: {item.phash_distance} of 64</p>}
                             {item.openclip_cosine != null && <p>Embedding similarity: {item.openclip_cosine}</p>}
                             <p>Reference type: {item.kind}</p>
                           </details>
-                          <button className="save-result-button" onClick={() => {
+                          <button className="save-result-button" aria-label={`Save to vault: result ${index + 1}`} onClick={() => {
                             setSelectedResult(item);
-                            window.requestAnimationFrame(() => document.getElementById('evidence-workspace')?.scrollIntoView({ behavior: 'smooth' }));
+                            window.requestAnimationFrame(() => {
+                              document.getElementById('evidence-workspace')?.scrollIntoView({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth' });
+                              savedEvidenceHeadingRef.current?.focus({ preventScroll: true });
+                            });
                           }}>Save to vault <span aria-hidden="true">↓</span></button>
                         </div>
                       </article>
@@ -257,10 +392,15 @@ function App() {
           </section>
         </div>
 
-        <EvidenceWorkspace selectedResult={selectedResult} queryLabel={queryLabel} clearSelection={() => setSelectedResult(null)} />
+        <EvidenceWorkspace selectedResult={selectedResult} queryLabel={queryLabel} clearSelection={() => setSelectedResult(null)} savedEvidenceHeadingRef={savedEvidenceHeadingRef} />
           </>
         )}
       </main>
+      <div className="back-to-top-placement" hidden={!showBackToTop && !backToTopFocused}>
+        <button type="button" className="back-to-top" onClick={backToTop} onFocus={() => setBackToTopFocused(true)} onBlur={() => setBackToTopFocused(false)}>
+          Back to top <span aria-hidden="true">↑</span>
+        </button>
+      </div>
       <footer><span>Reclaim / GDI Hackathon 2026</span><span>Demonstration using safe sample images</span></footer>
     </div>
   );
