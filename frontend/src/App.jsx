@@ -285,8 +285,8 @@ function App() {
     Helping survivors regain control of their digital lives with privacy, support, and the freedom to choose what happens next.
   </p>
 </section>
-        <div className="working-layout">
-          <section className="panel controls-panel" aria-labelledby="search-heading" data-scroll-reveal>
+        <div className="working-layout" data-scroll-reveal>
+          <section className="panel controls-panel" aria-labelledby="search-heading">
             <div className="panel-head">
               <div>
                 <p className="section-kicker">Discover</p>
@@ -339,7 +339,7 @@ function App() {
             {error && <div className="error" role="alert">{error}</div>}
           </section>
 
-          <section className="panel results-panel" aria-labelledby="results-heading" data-scroll-reveal>
+          <section className="panel results-panel" aria-labelledby="results-heading">
             <div className="panel-head">
               <div>
                 <p className="section-kicker purple">Review</p>
