@@ -1,5 +1,7 @@
 > **v0.7 update:** See `RECLAIM_V0_7_README.md` for two new information pages, page routing, and muted charcoal/plum/teal styling. Existing backend and app functionality are unchanged.
 
+> **v0.8 update: the image-processing engine is connected.** The Python server now runs Suhani's image processor on uploads (`POST /api/analyze`) and can compare an upload with an Unsplash test collection (`POST /api/search/unsplash`). The sample catalog loads itself on first start, so there is no separate seeding step. See [Image engine and Unsplash test collection](#image-engine-and-unsplash-test-collection-v08).
+
 # Reclaim — Discovery Engine v0.2 (React + Python)
 
 > A **safe demonstration** of multimethod image matching against preapproved local reference images. This is not internet-wide reverse-image search, a production NCII detection service, a forensic evidence vault, or a secure investigation system. **Use harmless sample pictures only.**
@@ -13,21 +15,25 @@ The frontend has an updated color system: user-selected charcoal `#18181B`, fore
 ## Folder layout
 
 ```text
-reclaim-fullstack-baseline/
+(project folder: the one that contains this README)
 ├── frontend/
 │   ├── src/App.jsx           # React UI, methods, results
 │   ├── src/styles.css        # Reclaim v0.3 brand system
 │   ├── public/samples/       # 8 harmless sample illustrations
 │   └── vite.config.js        # Local /api proxy to FastAPI
 ├── backend/
-│   ├── app/main.py           # GET health/catalog + POST search API
+│   ├── app/main.py           # The API: health, catalog, search, analyze, Unsplash search
 │   ├── app/features.py       # Pillow + SHA-256 + DCT pHash
+│   ├── app/engine/           # Image-processing engine used by the API (info, metadata, hashes, Unsplash)
+│   ├── app/seed.py           # Loads the sample catalog (runs automatically on first start)
 │   ├── app/embeddings.py     # Optional locally configured OpenCLIP
 │   ├── app/store.py          # SQLite reference catalog
 │   ├── demo_reference_images/# ONLY harmless test images
-│   ├── scripts/seed_demo.py  # Index approved reference features
+│   ├── scripts/seed_demo.py  # Rebuild the sample catalog by hand (rarely needed)
 │   ├── tests/               # Python unit + API tests
 │   └── requirements.txt
+├── reclaim-fullstack-baseline/image-engine/   # Original command-line image engine (still runs on its own)
+├── .env.example              # Copy to .env and add the Unsplash key (never commit .env)
 ├── docs/TOOL_MAP.md          # ExifTool, ImageMagick, Autopsy, Maltego roles
 ├── docs/ROADMAP.md           # MVP versus reach goals
 └── .github/workflows/check.yml
@@ -36,6 +42,8 @@ reclaim-fullstack-baseline/
 ## Run locally in VS Code
 
 Install **Python 3.11–3.13**, **Node.js 20+**, and **VS Code**. Open the **whole repository root folder** in VS Code, not only `frontend`.
+
+Run every backend command below **from the project folder** (the one containing this README). After pulling new changes, run the `pip install -r backend/requirements.txt` line again so new packages are installed. The `seed_demo` line is optional: the server loads the sample catalog by itself the first time it starts.
 
 ### Terminal A: Python backend
 
@@ -123,12 +131,17 @@ For the hackathon, demo **both locally from VS Code** instead. A future external
 ## API summary
 
 ```text
-GET  /api/health
-GET  /api/catalog
-POST /api/search?methods=sha256,phash
-Content-Type: image/png | image/jpeg | image/webp
-Body: raw image bytes (no multipart, no filename)
+GET  /api/health                                  status, available methods and sources
+GET  /api/catalog                                 the sample reference images
+POST /api/search?methods=sha256,phash             match an upload against the sample catalog
+POST /api/analyze                                 image engine report for an upload
+POST /api/search/unsplash?category=portrait       match an upload against an Unsplash test collection
+GET  /api/unsplash/thumbnail/{photo_id}           preview of a photo from a recent Unsplash search
+Content-Type (POST): image/png | image/jpeg | image/webp
+Body (POST): raw image bytes (no multipart, no filename)
 ```
+
+`/api/health` and `/api/catalog` open in a browser. The POST addresses need an image sent to them, so use the app (or `curl --data-binary @image.jpg -H "Content-Type: image/jpeg" ...`).
 
 `POST /api/search` returns candidate IDs, matching method names, pHash Hamming distances (0 to 64), optional OpenCLIP cosine values, and a clear unverified status. No reverse-image provider, website scraper, or OSINT action is called.
 
@@ -164,3 +177,16 @@ For exact walkthrough, data model, privacy limits, and verified official Reddit 
 6. Optionally restore the exported demo package to test round-trip recovery.
 
 **No extra npm or Python libraries are required beyond the baseline.** This edition uses the browser's native IndexedDB/Web Crypto rather than another dependency. It runs best on localhost (Web Crypto requires a secure context). The React frontend still uses the Vite `/api` local proxy. Uploading only the React frontend to Netlify does not host Python or enable image matching.
+
+## Image engine and Unsplash test collection (v0.8)
+
+The command-line image engine in `reclaim-fullstack-baseline/image-engine/` is now also available through the API, adapted in `backend/app/engine/` to work on in-memory uploads.
+
+**`POST /api/analyze`** returns, for one uploaded image: file facts (format, size, colour mode), brightness and contrast, three perceptual fingerprints (pHash, dHash, aHash) and the image's metadata. Nothing is stored. Metadata is read with **ExifTool** when it is installed (the image is piped to it, never written to disk); otherwise Pillow reads the basic EXIF fields, so the feature works without ExifTool. Metadata can include camera details, timestamps and GPS location, and this endpoint returns it to the person who uploaded the image.
+
+**`POST /api/search/unsplash?category=...`** compares an upload with the top 10 Unsplash photos for one category (`nature`, `landscape`, `architecture`, `flowers`, `food`, `technology`, `portrait`, `animals`). Only the category word is sent to Unsplash; the uploaded image stays on this computer. Results use the same close/exploratory pHash tiers as the sample search, not percentages.
+
+- **This is not a reverse-image search.** A match is only possible when the uploaded picture is itself one of the photos Unsplash returns for that category. To try it, download a photo that appears near the top of an Unsplash search for one of the categories, then upload it with that category selected.
+- **Key setup:** copy `.env.example` to `.env` in the project folder and put the Unsplash access key after `UNSPLASH_ACCESS_KEY=`. Restart the backend. `.env` is ignored by git; never commit the key. Without a key, everything else still works and `/api/health` reports the Unsplash source as unavailable.
+- **Rate limit:** Unsplash demo keys allow 50 API requests per hour. Each category search costs one request, results are remembered for an hour, and image downloads do not count.
+- **Tests** use a simulated Unsplash, so they need no key and no internet.
