@@ -1,0 +1,10 @@
+# Packages for running the command-line image engine in this folder on its own:
+#   python -m pip install -r requirements.txt
+# (Setup notes live in requirements_for_image.txt at the project root. ExifTool is a
+# separate program, not a pip package.)
+Pillow
+opencv-python
+numpy
+ImageHash
+requests
+python-dotenv

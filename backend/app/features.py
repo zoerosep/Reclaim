@@ -12,7 +12,8 @@ from PIL import Image, ImageOps, UnidentifiedImageError
 from scipy.fft import dctn
 
 # Limit decompression bombs; uploaded-image size is separately limited in the API.
-Image.MAX_IMAGE_PIXELS = 16_000_000
+# 50 megapixels covers full-size camera and stock photos (many are 24-45 MP).
+Image.MAX_IMAGE_PIXELS = 50_000_000
 SUPPORTED_FORMATS = {'PNG', 'JPEG', 'WEBP'}
 
 
