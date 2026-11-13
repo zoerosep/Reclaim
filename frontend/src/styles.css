@@ -166,11 +166,19 @@ main { max-width: 1320px; padding: 0 clamp(18px, 4vw, 54px) 72px; margin: 0 auto
 
 .demo-row { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
 .demo-option { color: var(--text); text-align: left; overflow: hidden; background: #30363C; border: 1px solid #4C555C; border-radius: 9px; padding: 0 0 9px; transition: border-color .15s ease; }
-.demo-option:hover { border-color: var(--forest-light); }
+.demo-option:not(:disabled):hover { border-color: var(--forest-light); }
+@media (hover: hover) {
+  .demo-option:not(:disabled) { transition: transform .2s ease, border-color .2s ease, background-color .2s ease; }
+  .demo-option:not(:disabled):hover { transform: translateY(-2px); border-color: #9983AA; background-color: var(--surface-purple); }
+}
+@media (hover: hover) and (prefers-reduced-motion: reduce) {
+  .demo-option:not(:disabled) { transition: none !important; }
+  .demo-option:not(:disabled):hover { transform: none; }
+}
 .demo-option img { width: 100%; height: 112px; display: block; object-fit: cover; background: #13191A; }
 .demo-option span { display: block; padding: 10px 12px 0; font-size: var(--size-interface); }
 .upload { display: flex; align-items: center; width: 100%; gap: 13px; padding: 17px 16px; margin-top: 15px; background: var(--surface-green); color: var(--text); border: 1px solid #52705E; border-radius: 9px; text-align: left; }
-.upload:hover { background: #294536; border-color: var(--forest-light); }
+.upload:not(:disabled):hover { background: #294536; border-color: var(--forest-light); }
 .upload-icon { display: grid; place-items: center; border-radius: 50%; width: 39px; height: 39px; flex-shrink: 0; background: #397352; color: white; font: 400 1.45rem/1 Georgia,serif; }
 .upload strong, .upload small { display: block; }
 .upload strong { font-size: 1rem; font-weight: 700; }
@@ -241,9 +249,9 @@ select:focus-visible, input:focus-visible, textarea:focus-visible { outline-colo
 .save-actions span { color: var(--subtle); font-size: var(--size-meta); max-width: 390px; }
 .primary-button, .outlined-button, .quiet-button { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 11px 15px; min-height: 43px; border-radius: 7px; font-size: var(--size-interface); text-decoration: none; text-align: center; }
 .primary-button { color: white; background: #24623E; border: 1px solid #548E67; }
-.primary-button:hover { color: white; background: #2C754B; border-color: var(--forest-light); }
+.primary-button:not(:disabled):hover { color: white; background: #2C754B; border-color: var(--forest-light); }
 .outlined-button { color: #DEE9F1; background: #2C3845; border: 1px solid #627589; }
-.outlined-button:hover { color: white; background: #354759; border-color: var(--steel-light); }
+.outlined-button:not(:disabled):hover { color: white; background: #354759; border-color: var(--steel-light); }
 .quiet-button { color: #E2D3ED; background: transparent; border: 1px solid #70677A; }
 .quiet-button:hover { background: #453850; }
 .quiet-button.remove { color: #E9B6BE; border-color: #755B62; }
@@ -329,7 +337,11 @@ select:focus-visible, input:focus-visible, textarea:focus-visible { outline-colo
 @media (max-width: 420px) {
   .help-quick-links { grid-template-columns: 1fr; }
 }
-.help-quick-link:hover { background: #322F3A; color: #fff; border-right-color: #9983AA; border-bottom-color: #9983AA; border-left-color: #9983AA; }
+@media (hover: hover) {
+  .help-quick-link:hover { background: #322F3A; color: #fff; border-color: #9983AA; }
+}
+.help-quick-link { transition: background-color .2s ease, border-color .2s ease, color .2s ease; }
+.help-quick-link:focus-visible { background: #322F3A; color: #fff; border-color: #9983AA; }
 .help-quick-number { font: 700 .75rem/1 var(--font-editorial); color: #C5ADC8; letter-spacing: .1em; }
 .help-quick-arrow { align-self: flex-end; margin-top: auto; color: #AFA0BC; }
 .help-sections { display: grid; gap: 23px; }
@@ -340,6 +352,14 @@ select:focus-visible, input:focus-visible, textarea:focus-visible { outline-colo
 .help-section-head p:not(.section-kicker) { font-size: .94rem; color: var(--muted); margin: 0; line-height: 1.6; }
 .resource-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 13px; }
 .resource-card { border: 1px solid #52545D; background: #2C3037; border-radius: 10px; padding: 22px; display: flex; flex-direction: column; align-items: flex-start; }
+@media (hover: hover) {
+  .resource-card { transition: transform .2s ease, border-color .2s ease, background-color .2s ease; }
+  .resource-card:hover { transform: translateY(-2px); border-color: #9983AA; background-color: #31353E; }
+}
+@media (hover: hover) and (prefers-reduced-motion: reduce) {
+  .resource-card { transition: none !important; }
+  .resource-card:hover { transform: none; }
+}
 .resource-tag { display: inline-block; font-size: .73rem; letter-spacing: .045em; color: #CDB8D7; margin-bottom: 10px; }
 .resource-card h3 { font: 600 1.2rem/1.35 var(--font-heading); margin: 0 0 10px; color: var(--text); }
 .resource-card p { color: var(--muted); line-height: 1.65; margin: 0 0 18px; font-size: .92rem; }
@@ -418,6 +438,32 @@ select:focus-visible, input:focus-visible, textarea:focus-visible { outline-colo
   .demo-option, .nav-links a, .upload, .save-result-button, .primary-button, .outlined-button, .quiet-button, .mini-cta, .help-quick-link, .resource-link { transition: none !important; }
 }
 
+/* Experimental shared card hover feedback. */
+@media (hover: hover) {
+  .controls-panel, .results-panel, .self-search-panel, .vault-panel, .reporting-panel, .export-box {
+    transition: border-color .2s ease;
+  }
+  .controls-panel:hover, .results-panel:hover, .self-search-panel:hover, .vault-panel:hover, .reporting-panel:hover, .export-box:hover {
+    border-color: #9983AA;
+  }
+  .self-search-item, .prevention-tools li, .fact-card, .info-mission, .source-section {
+    transition: translate .2s ease, border-color .2s ease, background-color .2s ease;
+  }
+  .self-search-item:hover, .prevention-tools li:hover, .fact-card:hover, .info-mission:hover, .source-section:hover {
+    translate: 0 -2px;
+    border-color: #9983AA;
+  }
+}
+@media (hover: hover) and (prefers-reduced-motion: reduce) {
+  .controls-panel, .results-panel, .self-search-panel, .vault-panel, .reporting-panel, .export-box,
+  .self-search-item, .prevention-tools li, .fact-card, .info-mission, .source-section {
+    transition: none !important;
+  }
+  .self-search-item:hover, .prevention-tools li:hover, .fact-card:hover, .info-mission:hover, .source-section:hover {
+    translate: none;
+  }
+}
+
 /* App page only: larger small text and more line spacing, for easier reading.
  * The "Why it matters" and "Get help" pages are not affected. */
 #main-content.app-page { --size-interface: 1rem; --size-meta: .9rem; }
@@ -430,3 +476,41 @@ select:focus-visible, input:focus-visible, textarea:focus-visible { outline-colo
 #main-content.app-page .metadata-details p { margin: 12px 0; }
 #main-content.app-page .field-label { margin-top: 20px; }
 #main-content.app-page :is(.self-search-item, .prevention-tools li) { gap: 11px; padding: 18px; }
+
+/* Keep App action colors distinct while sharing a restrained lavender border. */
+@media (hover: hover) {
+  #main-content.app-page :is(.upload, .primary-button, .outlined-button, .quiet-button:not(.remove), .save-result-button):not(:disabled) {
+    transition-duration: .2s;
+  }
+  #main-content.app-page :is(.upload, .primary-button, .outlined-button, .quiet-button:not(.remove), .save-result-button):not(:disabled):hover {
+    border-color: #9983AA;
+  }
+}
+
+/* Purple hover surfaces for the requested App upload, backup, and source controls. */
+@media (hover: hover) {
+  #main-content.app-page .source-settings {
+    transition: background-color .2s ease, border-color .2s ease;
+  }
+  #main-content.app-page .source-settings:hover,
+  #main-content.app-page :is(.upload, .export-button):not(:disabled):hover {
+    background-color: var(--surface-purple);
+    border-color: #9983AA;
+  }
+}
+@media (hover: hover) and (prefers-reduced-motion: reduce) {
+  #main-content.app-page .source-settings { transition: none !important; }
+}
+
+@media (hover: hover) {
+  .back-to-top:not(:disabled) {
+    transition: background-color .2s ease, border-color .2s ease;
+  }
+  .back-to-top:not(:disabled):hover {
+    background-color: var(--surface-purple);
+    border-color: #9983AA;
+  }
+}
+@media (hover: hover) and (prefers-reduced-motion: reduce) {
+  .back-to-top { transition: none !important; }
+}
