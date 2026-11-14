@@ -151,7 +151,6 @@ export function WhyItMattersPage({ onNavigate }) {
           <a href="/" onClick={event => onNavigate?.(event, '/')} className="mini-cta">Open the app <span aria-hidden="true">→</span></a>
         </article>
       </div>
-      <p className="facts-caveat">These figures come from different surveys and measure different experiences. The first two concern nonconsensual intimate-image distribution; the other three concern online harassment more broadly.</p>
     </section>
 
     <section className="panel info-mission" aria-labelledby="mission-title" data-scroll-reveal>
@@ -161,11 +160,6 @@ export function WhyItMattersPage({ onNavigate }) {
         <p>Reclaim is a hackathon project exploring how people could find possible image matches, choose what information to keep, and access reporting guidance and support resources.</p>
         <p>The experience is designed around choice. Possible matches are for people to review, not conclusions made on their behalf.</p>
       </div>
-      <aside className="mission-note">
-        <span className="mission-mark" aria-hidden="true">✳</span>
-        <h3>A demonstration, not a live search</h3>
-        <p>Reclaim currently searches an approved local demo collection. It does not scan the live internet. Do not upload intimate or sensitive imagery.</p>
-      </aside>
     </section>
 
     <section className="panel source-section" aria-labelledby="sources-title" data-scroll-reveal>
