@@ -315,7 +315,7 @@ select:focus-visible, input:focus-visible, textarea:focus-visible { outline-colo
   transition: color .15s ease, background-color .15s ease, border-color .15s ease;
 }
 .facts-caveat { margin: 15px 2px 28px; color: var(--subtle); font-size: .82rem; line-height: 1.65; }
-.info-mission { display: grid; grid-template-columns: 1.6fr .9fr; gap: clamp(24px,4vw,60px); align-items: center; padding: clamp(24px,3vw,40px); margin-bottom: 22px; }
+.info-mission { display: grid; grid-template-columns: 1fr; gap: clamp(24px,4vw,60px); align-items: center; padding: clamp(24px,3vw,40px); margin-bottom: 22px; }
 .info-mission h2, .source-section h2, .help-section h2 { font: 600 clamp(1.6rem,2.25vw,2.05rem)/1.25 var(--font-heading); margin: 0 0 14px; }
 .info-mission-text > p:not(.section-kicker) { color: var(--muted); font-size: .98rem; line-height: 1.8; max-width: 720px; }
 .mission-note { background: #302D37; border: 1px solid #63556B; border-radius: 12px; padding: 25px; }
